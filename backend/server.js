@@ -45,7 +45,13 @@ app.use((err, req, res, next) => {
   })
 })
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`)
-  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`)
-})
+// Export for serverless
+export default app
+
+// Start server only when not in Vercel
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`)
+    console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`)
+  })
+}
