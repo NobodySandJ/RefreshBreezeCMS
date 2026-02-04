@@ -10,6 +10,7 @@ const AdminLogin = () => {
     password: ''
   })
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -75,14 +76,24 @@ const AdminLogin = () => {
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Password
             </label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-green focus:border-custom-green transition-all"
-              placeholder="Enter password"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-custom-green focus:border-custom-green transition-all"
+                placeholder="Enter password"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-custom-green transition-colors"
+                tabIndex="-1"
+              >
+                <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'} text-lg`}></i>
+              </button>
+            </div>
           </div>
 
           <button
@@ -106,7 +117,10 @@ const AdminLogin = () => {
 
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-xs text-center text-gray-400">
-            Email: <span className="font-mono">admin@breeze</span> | Password: <span className="font-mono">segarhijau</span>
+            Username: <span className="font-mono">admin@breeze:superadmin</span>
+          </p>
+          <p className="text-xs text-center text-gray-400 mt-1">
+            Password: <span className="font-mono">hijausegar</span>
           </p>
         </div>
 
