@@ -1,6 +1,6 @@
 import express from 'express'
 import cors from 'cors'
-import dotenv from 'dotenv'
+// Note: dotenv removed - Vercel provides environment variables directly via process.env
 import orderRoutes from '../backend/routes/orders.js'
 import memberRoutes from '../backend/routes/members.js'
 import eventRoutes from '../backend/routes/events.js'
@@ -8,8 +8,6 @@ import configRoutes from '../backend/routes/config.js'
 import faqRoutes from '../backend/routes/faqs.js'
 import authRoutes from '../backend/routes/auth.js'
 import uploadRoutes from '../backend/routes/upload.js'
-
-dotenv.config()
 
 const app = express()
 
@@ -37,7 +35,7 @@ app.get('/api/health', (req, res) => {
 
 // Debug route to see what paths are received
 app.use('*', (req, res) => {
-  res.status(404).json({ 
+  res.status(404).json({
     error: 'Not found',
     path: req.originalUrl,
     baseUrl: req.baseUrl,
@@ -48,7 +46,7 @@ app.use('*', (req, res) => {
 // Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack)
-  res.status(500).json({ 
+  res.status(500).json({
     error: 'Something went wrong!',
     message: process.env.NODE_ENV === 'development' ? err.message : undefined
   })
