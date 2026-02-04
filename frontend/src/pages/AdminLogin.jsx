@@ -117,10 +117,10 @@ const AdminLogin = () => {
 
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-xs text-center text-gray-400">
-            Username: <span className="font-mono">admin@breeze:superadmin</span>
+            Username: <span className="font-mono">staffERBE</span>
           </p>
           <p className="text-xs text-center text-gray-400 mt-1">
-            Password: <span className="font-mono">hijausegar</span>
+            Password: <span className="font-mono">hijauERBE</span>
           </p>
         </div>
 

@@ -11,6 +11,7 @@ Website fullstack untuk penjualan Cheki (foto polaroid) dengan member Refresh Br
 ## 🌟 Fitur Utama
 
 ### 🛍️ Customer Features
+
 - ✅ **Shopping Cart System** - Tambah/kurangi item dengan smooth animations
 - ✅ **Event-Based Orders** - Pilih event terlebih dahulu sebelum checkout
 - ✅ **Simplified Checkout** - Hanya 2 field: Nama + Kontak (IG/WA)
@@ -21,6 +22,7 @@ Website fullstack untuk penjualan Cheki (foto polaroid) dengan member Refresh Br
 - ✅ **Dynamic Pricing** - 25k per member, 30k group member
 
 ### 🔐 Admin CMS Features
+
 - ✅ **JWT Authentication** - Secure login dengan bcrypt password hashing
 - ✅ **Dashboard Overview** - Real-time order statistics
 - ✅ **Multi-Filter System**:
@@ -45,6 +47,7 @@ Website fullstack untuk penjualan Cheki (foto polaroid) dengan member Refresh Br
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **React 18** + **Vite** - Fast build tool and modern React
 - **Tailwind CSS** - Utility-first responsive design
 - **Framer Motion** - Smooth animations
@@ -55,6 +58,7 @@ Website fullstack untuk penjualan Cheki (foto polaroid) dengan member Refresh Br
 - **React Icons** - Icon library
 
 ### Backend
+
 - **Node.js** + **Express** - RESTful API server
 - **Supabase** - PostgreSQL database with real-time features
 - **Supabase Storage** - File storage for payment proofs
@@ -65,6 +69,7 @@ Website fullstack untuk penjualan Cheki (foto polaroid) dengan member Refresh Br
 - **Multer** - Multipart form-data handling
 
 ### Infrastructure
+
 - **Vercel** - Frontend & Backend hosting
 - **Supabase** - Database & Storage
 - **GitHub** - Version control
@@ -138,6 +143,7 @@ npm run dev
 ```
 
 **Backend .env:**
+
 ```env
 PORT=5000
 SUPABASE_URL=your_supabase_url
@@ -160,6 +166,7 @@ npm run dev
 ```
 
 **Frontend .env:**
+
 ```env
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_anon_key
@@ -202,6 +209,7 @@ Atau gunakan Postman/Thunder Client.
 ## 📱 Cara Menggunakan
 
 ### Customer Flow:
+
 1. Buka homepage → pilih member
 2. Add to cart
 3. Scroll ke "Konfirmasi Pembayaran"
@@ -211,6 +219,7 @@ Atau gunakan Postman/Thunder Client.
 7. Tunggu email konfirmasi
 
 ### Admin Flow:
+
 1. Login di `/admin/login`
 2. **Lihat semua pesanan** di tab Orders
 3. **Filter berdasarkan**:
@@ -226,6 +235,7 @@ Atau gunakan Postman/Thunder Client.
 ## 🎨 Fitur Status Warna
 
 ### Sistem Warna Otomatis:
+
 - **🟦 PENDING (Putih)**: Pesanan baru masuk, belum diproses
 - **🟦 CHECKED (Biru)**: Admin sudah cek pembayaran, validasi OK
 - **🟢 COMPLETED (Hijau)**: Customer sudah ambil tiket fisik di venue
@@ -235,6 +245,7 @@ Admin tinggal ubah dropdown status di tabel.
 ## 📊 Export Excel
 
 Fitur export menghasilkan file `.xlsx` dengan kolom:
+
 - Order Number
 - Nama Lengkap
 - WhatsApp
@@ -259,11 +270,13 @@ Filter by date range sebelum export untuk rekap bulanan/mingguan.
 ## 🎯 API Endpoints## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 16+
 - Supabase account
 - Git
 
 ### 1️⃣ Clone & Install
+
 ```bash
 git clone https://github.com/your-username/rb-remake.git
 cd rb-remake
@@ -285,6 +298,7 @@ cp .env.example .env
 ```
 
 ### 2️⃣ Setup Supabase Database
+
 ```bash
 # Login to Supabase Dashboard
 # Go to SQL Editor
@@ -294,6 +308,7 @@ cp .env.example .env
 ```
 
 ### 3️⃣ Setup Supabase Storage
+
 ```bash
 # In Supabase Dashboard > Storage
 # Create bucket: payment-proofs
@@ -302,6 +317,7 @@ cp .env.example .env
 ```
 
 ### 4️⃣ Run Development Server
+
 ```bash
 # Terminal 1: Backend
 cd backend
@@ -313,13 +329,14 @@ npm run dev
 ```
 
 Open http://localhost:3000 for customer site  
-Open http://localhost:3000/admin/login for admin (superadmin / hijausegar)
+Open http://localhost:3000/admin/login for admin (staffERBE / hijauERBE)
 
 ---
 
 ## 📖 API Endpoints
 
 ### Public Endpoints
+
 - `GET /api/events` - Get all events (upcoming & past)
 - `GET /api/members` - Get member data from JSON
 - `GET /api/config` - Get payment config (rekening, prices)
@@ -328,6 +345,7 @@ Open http://localhost:3000/admin/login for admin (superadmin / hijausegar)
 - `POST /api/upload/payment-proof` - Upload & compress payment image
 
 ### Admin Protected Endpoints (Requires JWT)
+
 - `POST /api/auth/login` - Admin login (returns JWT token)
 - `GET /api/orders` - Get filtered orders (status, type, event, date, search)
 - `GET /api/orders/:id` - Get single order detail
@@ -352,7 +370,7 @@ Open http://localhost:3000/admin/login for admin (superadmin / hijausegar)
 ✅ **SQL Injection Safe** - Supabase client parameterized queries  
 ✅ **File Upload Security** - Size limits, type validation, compression  
 ✅ **Row Level Security** - Supabase RLS ready  
-✅ **No Secrets in Code** - All credentials via env vars  
+✅ **No Secrets in Code** - All credentials via env vars
 
 **Full details:** [SECURITY.md](SECURITY.md)
 
@@ -366,7 +384,7 @@ Open http://localhost:3000/admin/login for admin (superadmin / hijausegar)
 ✅ **Responsive Grids** - Auto-adjust columns  
 ✅ **Scrollable Tables** - Horizontal scroll on mobile  
 ✅ **Adaptive Modals** - Full-width on mobile  
-✅ **Centered Toasts** - Non-blocking notifications  
+✅ **Centered Toasts** - Non-blocking notifications
 
 **Tested on:** iPhone SE, iPhone 12, iPad, iPad Pro, Desktop, Ultra-wide
 
@@ -382,7 +400,7 @@ Open http://localhost:3000/admin/login for admin (superadmin / hijausegar)
 ✅ **Lazy Loading** - Components loaded on-demand  
 ✅ **No Sourcemaps** - Production builds lightweight  
 ✅ **Progressive JPEG** - Faster image loading  
-✅ **CDN Ready** - Vercel automatic CDN  
+✅ **CDN Ready** - Vercel automatic CDN
 
 ---
 
@@ -391,6 +409,7 @@ Open http://localhost:3000/admin/login for admin (superadmin / hijausegar)
 ### Deploy to Vercel (Recommended)
 
 1. **Push to GitHub**
+
    ```bash
    git add .
    git commit -m "Ready for deployment"
@@ -430,11 +449,13 @@ Open http://localhost:3000/admin/login for admin (superadmin / hijausegar)
 - 🧪 [TESTING.md](TESTING.md) - Testing checklist (if exists)
 
 ---
+
 - **Project Summary:** [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)
 
 ## 🤝 Contributing
 
 Untuk development lokal:
+
 1. Fork repository
 2. Create feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
@@ -448,6 +469,7 @@ Untuk development lokal:
 ## 💬 Support
 
 Untuk pertanyaan atau issue:
+
 - Email: [contact@refreshbreeze.com]
 - Instagram: [@refbreeze](https://instagram.com/refbreeze)
 
