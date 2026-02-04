@@ -20,6 +20,7 @@ import {
 const AdminPage = () => {
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('orders')
+  const [orderSubTab, setOrderSubTab] = useState('all') // 'all', 'ots', 'po'
   const [orders, setOrders] = useState([])
   const [members, setMembers] = useState([])
   const [events, setEvents] = useState([])
@@ -58,7 +59,7 @@ const AdminPage = () => {
     if (activeTab === 'orders') {
       fetchOrders()
     }
-  }, [statusFilter, otsFilter, eventFilter, dateFilter, searchQuery, activeTab])
+  }, [statusFilter, otsFilter, eventFilter, dateFilter, searchQuery, activeTab, orderSubTab])
 
   const checkAuth = () => {
     const token = localStorage.getItem('admin_token')
@@ -73,7 +74,16 @@ const AdminPage = () => {
       const params = {}
       
       if (statusFilter !== 'all') params.status = statusFilter
-      if (otsFilter !== 'all') params.is_ots = otsFilter
+      
+      // Apply sub-tab filter
+      if (orderSubTab === 'ots') {
+        params.is_ots = 'true'
+      } else if (orderSubTab === 'po') {
+        params.is_ots = 'false'
+      } else if (otsFilter !== 'all') {
+        params.is_ots = otsFilter
+      }
+      
       if (eventFilter !== 'all') params.event_id = eventFilter
       if (searchQuery) params.search = searchQuery
       
@@ -392,6 +402,49 @@ const AdminPage = () => {
 
   const renderOrders = () => (
     <div className="space-y-6">
+      {/* Sub-tabs for OTS / PO */}
+      <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="flex border-b">
+          <button
+            onClick={() => setOrderSubTab('all')}
+            className={`flex-1 px-6 py-4 font-semibold transition-colors ${
+              orderSubTab === 'all'
+                ? 'bg-custom-green text-white border-b-4 border-green-700'
+                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <span className="flex items-center justify-center gap-2">
+              <FaShoppingCart />
+              Semua Order
+            </span>
+          </button>
+          <button
+            onClick={() => setOrderSubTab('ots')}
+            className={`flex-1 px-6 py-4 font-semibold transition-colors ${
+              orderSubTab === 'ots'
+                ? 'bg-orange-500 text-white border-b-4 border-orange-700'
+                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <span className="flex items-center justify-center gap-2">
+              🏪 Order OTS
+            </span>
+          </button>
+          <button
+            onClick={() => setOrderSubTab('po')}
+            className={`flex-1 px-6 py-4 font-semibold transition-colors ${
+              orderSubTab === 'po'
+                ? 'bg-blue-500 text-white border-b-4 border-blue-700'
+                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            <span className="flex items-center justify-center gap-2">
+              📦 Pre-Order
+            </span>
+          </button>
+        </div>
+      </div>
+
       {/* Filters & Actions */}
       <div className="bg-white p-6 rounded-xl shadow-md">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
@@ -625,16 +678,17 @@ const AdminPage = () => {
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {[
-          { label: 'Total Orders', value: orders.length, color: 'bg-blue-500' },
-          { label: 'Pending', value: orders.filter(o => o.status === 'pending').length, color: 'bg-gray-400' },
-          { label: 'Checked', value: orders.filter(o => o.status === 'checked').length, color: 'bg-blue-600' },
-          { label: 'Completed', value: orders.filter(o => o.status === 'completed').length, color: 'bg-green-600' }
+          { label: 'Total Orders', value: orders.length, color: 'bg-blue-500', icon: '🛒' },
+          { label: 'Order OTS', value: orders.filter(o => o.is_ots).length, color: 'bg-orange-500', icon: '🏪' },
+          { label: 'Pre-Order', value: orders.filter(o => !o.is_ots).length, color: 'bg-blue-600', icon: '📦' },
+          { label: 'Pending', value: orders.filter(o => o.status === 'pending').length, color: 'bg-gray-400', icon: '⏳' },
+          { label: 'Completed', value: orders.filter(o => o.status === 'completed').length, color: 'bg-green-600', icon: '✅' }
         ].map((stat, index) => (
           <div key={index} className="bg-white p-6 rounded-xl shadow-md">
             <div className={`w-12 h-12 ${stat.color} rounded-full flex items-center justify-center text-white text-2xl mb-3`}>
-              <FaShoppingCart />
+              {stat.icon}
             </div>
             <div className="text-3xl font-bold text-gray-800">{stat.value}</div>
             <div className="text-sm text-gray-500">{stat.label}</div>
