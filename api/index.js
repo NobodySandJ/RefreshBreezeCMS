@@ -21,7 +21,7 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
-// Routes - Note: /api prefix is already in the URL when it reaches here
+// Routes - keeping /api prefix as Express receives full path from Vercel
 app.use('/api/auth', authRoutes)
 app.use('/api/orders', orderRoutes)
 app.use('/api/members', memberRoutes)
@@ -33,6 +33,16 @@ app.use('/api/upload', uploadRoutes)
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Refresh Breeze API Running' })
+})
+
+// Debug route to see what paths are received
+app.use('*', (req, res) => {
+  res.status(404).json({ 
+    error: 'Not found',
+    path: req.originalUrl,
+    baseUrl: req.baseUrl,
+    method: req.method
+  })
 })
 
 // Error handling
