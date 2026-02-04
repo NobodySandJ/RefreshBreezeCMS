@@ -21,15 +21,15 @@
     "react-parallax-tilt": "^1.7.319",
     "react-router-dom": "^6.21.1",
     "react-toastify": "^11.0.5",
-    "sweetalert2": "^11.10.3"
-  },
-  "devDependencies": {
-    "@types/react": "^18.2.43",
-    "@types/react-dom": "^18.2.17",
+    "sweetalert2": "^11.10.3",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.33",
     "tailwindcss": "^3.4.1",
     "vite": "^5.0.8"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17"
   }
 }
