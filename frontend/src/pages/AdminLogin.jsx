@@ -115,14 +115,6 @@ const AdminLogin = () => {
           </button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-xs text-center text-gray-400">
-            Username: <span className="font-mono">staffERBE</span>
-          </p>
-          <p className="text-xs text-center text-gray-400 mt-1">
-            Password: <span className="font-mono">hijauERBE</span>
-          </p>
-        </div>
 
         <div className="mt-6 text-center">
           <button
