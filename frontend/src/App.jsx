@@ -28,7 +28,7 @@ function App() {
   }, [])
 
   return (
-    <Router>
+    <Router basename="/RefreshBreezeCMS">
       <ToastContainer
         position="top-center"
         autoClose={2000}
