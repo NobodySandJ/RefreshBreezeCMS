@@ -256,7 +256,7 @@ const ShopPage = () => {
                 >
                     <div className="absolute inset-0">
                         <img 
-                           src="/images/members/group.webp" 
+                           src={getAssetPath('/images/members/group.webp')} 
                            alt="Group Cheki" 
                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
                         />

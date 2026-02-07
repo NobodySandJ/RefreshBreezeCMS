@@ -307,7 +307,7 @@ const HomePage = () => {
                   className="absolute -bottom-6 -left-6 bg-white p-6 rounded-[2rem] shadow-xl border border-gray-100 flex items-center gap-4 animate-float z-30"
                 >
                    <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden">
-                      <img src="/images/logos/logo.webp" alt="Logo" className="w-full h-full object-cover" />
+                      <img src={getAssetPath('/images/logos/logo.webp')} alt="Logo" className="w-full h-full object-cover" />
                    </div>
                    <div>
                       <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Since</p>
