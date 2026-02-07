@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  base: '/RefreshBreezeCMS/', // Required for GitHub Pages
+  base: '/', // Use '/' for Vercel, use '/RefreshBreezeCMS/' for GitHub Pages
   plugins: [react()],
   server: {
     host: true, // Allow access from network (mobile testing)
