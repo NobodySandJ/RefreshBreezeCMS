@@ -11,25 +11,12 @@ import uploadRoutes from '../backend/routes/upload.js'
 
 const app = express()
 
-// Middleware - CORS configuration
-const allowedOrigins = [
-  'https://refresh-breeze-web.vercel.app',
-  'https://refresh-breeze-api.vercel.app',
-  process.env.FRONTEND_URL?.replace(/\/$/, ''), // Remove trailing slash if present
-].filter(Boolean)
-
+// Middleware - CORS configuration (allow all origins for Vercel deployment)
 app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true)
-    // Remove trailing slash from origin for comparison
-    const normalizedOrigin = origin.replace(/\/$/, '')
-    if (allowedOrigins.includes(normalizedOrigin) || normalizedOrigin.includes('vercel.app')) {
-      return callback(null, true)
-    }
-    return callback(null, true) // Allow all for now to debug
-  },
-  credentials: true
+  origin: true, // Reflect the request origin, as CORS headers will be set to the request origin
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
