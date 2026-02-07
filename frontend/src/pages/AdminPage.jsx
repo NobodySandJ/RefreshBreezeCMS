@@ -1949,23 +1949,32 @@ const EventModal = ({ members, onClose, onSuccess, editingEvent }) => {
 
           {/* Lokasi dan Jam - hanya untuk event regular */}
           {eventType === 'regular' && (
-            <div className="grid grid-cols-2 gap-2">
+            <>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="text"
+                  placeholder="Lokasi *"
+                  value={formData.lokasi}
+                  onChange={(e) => setFormData({...formData, lokasi: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-lg text-sm"
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Jam Event (14:00 WIB)"
+                  value={formData.event_time}
+                  onChange={(e) => setFormData({...formData, event_time: e.target.value})}
+                  className="w-full px-3 py-2 border rounded-lg text-sm"
+                />
+              </div>
               <input
                 type="text"
-                placeholder="Lokasi *"
-                value={formData.lokasi}
-                onChange={(e) => setFormData({...formData, lokasi: e.target.value})}
-                className="w-full px-3 py-2 border rounded-lg text-sm"
-                required
-              />
-              <input
-                type="text"
-                placeholder="Jam (14:00 WIB)"
-                value={formData.event_time}
-                onChange={(e) => setFormData({...formData, event_time: e.target.value})}
+                placeholder="Jam Cheki (15:00 - 17:00 WIB)"
+                value={formData.cheki_time}
+                onChange={(e) => setFormData({...formData, cheki_time: e.target.value})}
                 className="w-full px-3 py-2 border rounded-lg text-sm"
               />
-            </div>
+            </>
           )}
 
           {/* Special Event Fields */}
