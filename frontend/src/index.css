@@ -6,227 +6,149 @@
   html {
     scroll-behavior: smooth;
   }
-  
+
   body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(to bottom right, #fdfdf8, rgba(195, 227, 163, 0.1), rgba(184, 223, 216, 0.15));
-    color: #1f2937;
+    background-color: #f4f4f5;
+    /* removed expensive svg noise filter */
+    color: #1a1a1a;
     overflow-x: hidden;
   }
-}
 
-@layer components {
-  /* Custom Scrollbar */
-  .custom-scrollbar::-webkit-scrollbar {
-    @apply w-2 h-2;
-  }
-  
-  .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-transparent;
-  }
-  
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full;
-  }
-  
-  .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-    @apply bg-gray-400;
+  /* Snap Scroll for Mobile Carousels */
+  .snap-x {
+    scroll-snap-type: x mandatory;
   }
 
-  /* Hide scrollbar for some elements */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
+  .snap-center {
+    scroll-snap-align: center;
   }
-  
-  .no-scrollbar {
+
+  .snap-mandatory {
+    scroll-snap-type: x mandatory;
+  }
+
+  /* Hide Scrollbar utility */
+  .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
 
-  /* Button Primary */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+
+}
+
+@layer components {
+  /* Refresh Breeze Primary Colors */
+  /* Green: #079108, White: #FFFFFF */
+
   .btn-primary {
-    @apply bg-custom-green text-white font-bold py-3 px-6 rounded-xl hover:bg-green-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95;
+    @apply bg-[#079108] text-white font-bold py-3 px-8 rounded-full hover:bg-[#067a07] transition-all shadow-lg hover:shadow-[#07910855] hover:-translate-y-0.5 active:scale-95;
   }
 
-  /* Card Shadow */
-  .card-shadow {
-    @apply shadow-md hover:shadow-xl transition-shadow duration-300;
+  .glass-card {
+    @apply bg-white/10 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_0_rgba(0, 0, 0, 0.1)];
   }
 
-  /* Badge Status */
-  .badge-pending {
-    @apply bg-custom-ivory text-gray-600 border-2 border-gray-300;
+  .text-glow-green {
+    text-shadow: 0 0 10px rgba(7, 145, 8, 0.4), 0 0 20px rgba(7, 145, 8, 0.2);
   }
-  
-  .badge-checked {
-    @apply bg-blue-100 text-blue-700 border-2 border-blue-400;
+
+  .text-glow-white {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.4);
   }
-  
-  .badge-completed {
-    @apply bg-green-100 text-green-700 border-2 border-green-400;
+
+  .border-glow-green {
+    @apply border border-[#079108]/30 shadow-[0_0_20px_rgba(7, 145, 8, 0.2)];
+  }
+
+  /* Vertical Text Utility */
+  .vertical-rl {
+    writing-mode: vertical-rl;
+  }
+
+  .text-orientation-mixed {
+    text-orientation: mixed;
+  }
+
+  /* Noise Texture Overlay (Softened for Light Theme) */
+  .noise-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: "";
+    opacity: 0.15;
+    z-index: 9999;
+    pointer-events: none;
+    background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply w-1.5 h-1.5;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-200 rounded-full hover:bg-gray-300;
   }
 }
 
-/* Animasi Loading */
-@keyframes spin-slow {
+/* Animations */
+@keyframes fadeInUp {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(20px);
   }
+
   to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin-slow {
-  animation: spin-slow 3s linear infinite;
-}
-
-/* Float Animation for Logo */
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-20px);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-/* Green Pulse Animation */
-@keyframes pulse-green {
-  0%, 100% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  50% {
     opacity: 1;
-    transform: scale(1.05);
+    transform: translateY(0);
   }
 }
 
-.animate-pulse-green {
-  animation: pulse-green 2s ease-in-out infinite;
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
 }
 
-/* Gradient Shine Animation */
-@keyframes gradient-shine {
-  0% {
+@keyframes slow-pan {
+  from {
     background-position: 0% 50%;
   }
-  50% {
+
+  to {
     background-position: 100% 50%;
   }
-  100% {
-    background-position: 0% 50%;
-  }
 }
 
-.animate-gradient-shine {
-  background-size: 200% 200%;
-  animation: gradient-shine 3s ease infinite;
+.animate-slow-pan {
+  background-size: 200% 100%;
+  animation: slow-pan 20s linear infinite alternate;
 }
 
-/* Scale on Hover */
-.hover-scale {
-  transition: transform 0.3s ease;
+/* 7 Column Layout Helpers */
+.hero-column {
+  @apply relative h-full transition-all duration-700 ease-in-out cursor-pointer overflow-hidden;
+  flex: 1;
 }
 
-.hover-scale:hover {
-  transform: scale(1.05);
+.hero-column:hover {
+  /* Removed expansion as per user request */
 }
 
-/* Green Glow */
-.green-glow {
-  box-shadow: 0 0 20px rgba(7, 145, 8, 0.3);
-}
-
-.green-glow:hover {
-  box-shadow: 0 0 30px rgba(7, 145, 8, 0.5);
-}
-
-/* React Toastify Custom Styling */
-.Toastify__toast {
-  border-radius: 16px !important;
-  font-family: 'Poppins', sans-serif !important;
-  font-weight: 600 !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
-}
-
-.Toastify__toast--success {
-  background: linear-gradient(135deg, #079108 0%, #10b114 100%) !important;
-  color: white !important;
-}
-
-.Toastify__toast--error {
-  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
-  color: white !important;
-}
-
-.Toastify__toast--warning {
-  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%) !important;
-  color: white !important;
-}
-
-.Toastify__progress-bar {
-  background: rgba(255, 255, 255, 0.8) !important;
-}
-
-.Toastify__close-button {
-  color: white !important;
-  opacity: 0.8 !important;
-}
-
-.Toastify__close-button:hover {
-  opacity: 1 !important;
-}
-
-/* AOS Override untuk smooth animations */
-[data-aos] {
-  pointer-events: auto;
-}
-
-[data-aos].aos-animate {
-  pointer-events: auto;
-}
-
-/* Button Ripple Effect */
-@keyframes ripple {
-  0% {
-    transform: scale(0);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(4);
-    opacity: 0;
-  }
-}
-
-.btn-ripple {
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-ripple::after {
+.hero-column::after {
   content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
+  @apply absolute inset-0 bg-black/20 transition-opacity duration-500 opacity-60;
 }
 
-.btn-ripple:active::after {
-  width: 300px;
-  height: 300px;
-}
-
-[data-aos].aos-animate {
-  pointer-events: auto;
+.hero-column:hover::after {
+  @apply opacity-20;
 }

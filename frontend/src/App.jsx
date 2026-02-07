@@ -1,10 +1,20 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, Suspense, lazy } from 'react'
 import AOS from 'aos'
-import { ToastContainer } from 'react-toastify'
-import HomePage from './pages/HomePage'
-import AdminPage from './pages/AdminPage'
-import AdminLogin from './pages/AdminLogin'
+import { ToastContainer, Zoom } from 'react-toastify'
+import LoadingSpinner from './components/LoadingSpinner'
+
+// Lazy Load Pages
+const HomePage = lazy(() => import('./pages/HomePage'))
+const AdminPage = lazy(() => import('./pages/AdminPage'))
+const AdminLogin = lazy(() => import('./pages/AdminLogin'))
+const MembersPage = lazy(() => import('./pages/MembersPage'))
+const MusicPage = lazy(() => import('./pages/MusicPage'))
+const MediaPage = lazy(() => import('./pages/MediaPage'))
+const SchedulePage = lazy(() => import('./pages/SchedulePage'))
+const ShopPage = lazy(() => import('./pages/ShopPage'))
+const FAQPage = lazy(() => import('./pages/FAQPage'))
+const StoryPage = lazy(() => import('./pages/StoryPage'))
 
 function App() {
   useEffect(() => {
@@ -20,8 +30,8 @@ function App() {
   return (
     <Router>
       <ToastContainer
-        position="top-right"
-        autoClose={3000}
+        position="top-center"
+        autoClose={2000}
         hideProgressBar={false}
         newestOnTop={true}
         closeOnClick
@@ -30,13 +40,23 @@ function App() {
         draggable
         pauseOnHover
         theme="light"
+        transition={Zoom}
         style={{ zIndex: 99999 }}
       />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminPage />} />
-      </Routes>
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/members" element={<MembersPage />} />
+          <Route path="/music" element={<MusicPage />} />
+          <Route path="/media" element={<MediaPage />} />
+          <Route path="/schedule" element={<SchedulePage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/faq" element={<FAQPage />} />
+          <Route path="/story" element={<StoryPage />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminPage />} />
+        </Routes>
+      </Suspense>
     </Router>
   )
 }

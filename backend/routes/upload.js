@@ -20,11 +20,31 @@ const upload = multer({
   }
 })
 
+// Multer error handler middleware
+const handleMulterError = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'File too large. Max 10MB allowed.' })
+    }
+    return res.status(400).json({ error: `Upload error: ${err.message}` })
+  } else if (err) {
+    return res.status(400).json({ error: err.message })
+  }
+  next()
+}
+
 // POST: Upload payment proof to Supabase Storage with auto-compression
-router.post('/payment-proof', upload.single('file'), async (req, res) => {
+router.post('/payment-proof', upload.single('file'), handleMulterError, async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' })
+      return res.status(400).json({
+        success: false,
+        error: 'No file uploaded. Please select an image file.',
+        debug: {
+          contentType: req.headers['content-type'],
+          bodyKeys: Object.keys(req.body || {})
+        }
+      })
     }
 
     console.log('📸 Original file:', {
@@ -66,8 +86,13 @@ router.post('/payment-proof', upload.single('file'), async (req, res) => {
     })
   } catch (error) {
     console.error('Error uploading file:', error)
-    res.status(500).json({ error: error.message })
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    })
   }
 })
 
 export default router
+

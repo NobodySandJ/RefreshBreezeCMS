@@ -173,7 +173,7 @@ router.post('/', async (req, res) => {
 // POST: Create OTS (On The Spot) order by admin
 router.post('/ots', authMiddleware, async (req, res) => {
   try {
-    const { event_id, nama_lengkap, whatsapp, email, instagram, items } = req.body
+    const { event_id, nama_lengkap, whatsapp, email, instagram, items, payment_method } = req.body
 
     if (!event_id) {
       return res.status(400).json({ error: 'Event ID is required' })
@@ -194,7 +194,8 @@ router.post('/ots', authMiddleware, async (req, res) => {
         total_harga,
         status: 'completed',
         is_ots: true,
-        created_by: 'admin'
+        created_by: 'admin',
+        payment_proof_url: payment_method || 'Cash' // Store Cash/QR here
       })
       .select()
       .single()
@@ -207,7 +208,7 @@ router.post('/ots', authMiddleware, async (req, res) => {
       const memberId = (item.member_id === 'group' || !UUID_REGEX.test(item.member_id))
         ? null
         : item.member_id
-      
+
       return {
         order_id: order.id,
         member_id: memberId,
@@ -273,7 +274,7 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
       `)
       .order('created_at', { ascending: false })
 
-    // Apply same filters as GET /orders
+    // Apply filters
     if (status && status !== 'all') query = query.eq('status', status)
     if (is_ots !== undefined && is_ots !== 'all') query = query.eq('is_ots', is_ots === 'true')
     if (event_id && event_id !== 'all') query = query.eq('event_id', event_id)
@@ -289,104 +290,150 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet('Orders')
 
-    // Define columns
+    // Define columns (shared structure)
     worksheet.columns = [
-      { header: 'Order Number', key: 'order_number', width: 20 },
+      { header: 'Order Number', key: 'order_number', width: 22 },
       { header: 'Tipe', key: 'tipe', width: 12 },
       { header: 'Nama Lengkap', key: 'nama_lengkap', width: 25 },
-      { header: 'WhatsApp', key: 'whatsapp', width: 15 },
+      { header: 'WhatsApp', key: 'whatsapp', width: 16 },
       { header: 'Email', key: 'email', width: 30 },
       { header: 'Instagram', key: 'instagram', width: 20 },
-      { header: 'Items', key: 'items', width: 40 },
-      { header: 'Total Harga', key: 'total_harga', width: 15 },
+      { header: 'Items', key: 'items', width: 45 },
+      { header: 'Total Harga', key: 'total_harga', width: 18 },
       { header: 'Status', key: 'status', width: 12 },
       { header: 'Tanggal Order', key: 'created_at', width: 20 },
+      // Extra columns for summary if needed, but we'll specific cells
     ]
 
-    // Add rows
-    orders.forEach(order => {
-      const itemsText = order.order_items
-        .map(item => `${item.item_name} (${item.quantity}x)`)
-        .join(', ')
-
-      worksheet.addRow({
-        order_number: order.order_number,
-        tipe: order.is_ots ? 'OTS' : 'Pre-Order',
-        nama_lengkap: order.nama_lengkap,
-        whatsapp: order.whatsapp,
-        email: order.email,
-        instagram: order.instagram || '-',
-        items: itemsText,
-        total_harga: order.total_harga,
-        status: order.status,
-        created_at: new Date(order.created_at).toLocaleString('id-ID'),
-      })
-    })
-
-    // Style header row
-    worksheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } }
-    worksheet.getRow(1).fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'FF079108' }
+    // Style Header
+    const styleHeader = (row) => {
+      row.font = { bold: true, color: { argb: 'FFFFFFFF' } }
+      row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF079108' } } // Green
+      row.alignment = { vertical: 'middle', horizontal: 'center' }
     }
-    worksheet.getRow(1).alignment = { vertical: 'middle', horizontal: 'center' }
 
-    // Add borders to all cells
-    worksheet.eachRow((row, rowNumber) => {
-      row.eachCell((cell) => {
-        cell.border = {
-          top: { style: 'thin' },
-          left: { style: 'thin' },
-          bottom: { style: 'thin' },
-          right: { style: 'thin' }
-        }
-        // Center align status and tipe columns
-        if (rowNumber > 1) {
+    styleHeader(worksheet.getRow(1))
+
+    // Helper to add orders
+    const addOrderRows = (orderList) => {
+      orderList.forEach(order => {
+        const itemsText = order.order_items
+          .map(item => `${item.item_name} (${item.quantity}x)`)
+          .join(', ')
+
+        const row = worksheet.addRow({
+          order_number: order.order_number,
+          tipe: order.is_ots ? 'OTS' : 'Pre-Order',
+          nama_lengkap: order.nama_lengkap,
+          whatsapp: order.whatsapp,
+          email: order.email,
+          instagram: order.instagram || '-',
+          items: itemsText,
+          total_harga: order.total_harga,
+          status: order.status,
+          created_at: new Date(order.created_at).toLocaleString('id-ID'),
+        })
+
+        // Style borders
+        row.eachCell((cell) => {
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
           cell.alignment = { vertical: 'middle', horizontal: 'left', wrapText: true }
+        })
+      })
+    }
+
+    // 1. Separate Orders
+    const poOrders = orders.filter(o => !o.is_ots)
+    const otsOrders = orders.filter(o => o.is_ots)
+
+    // 2. Add PO Orders
+    addOrderRows(poOrders)
+
+    // 3. Add Spacer & OTS Header
+    if (otsOrders.length > 0) {
+      worksheet.addRow([])
+      worksheet.addRow([])
+      const otsHeaderRow = worksheet.addRow(['ORDER OTS (ON THE SPOT)', '', '', '', '', '', '', '', '', ''])
+      otsHeaderRow.font = { bold: true, size: 12, color: { argb: 'FFFFFFFF' } }
+      otsHeaderRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF97316' } } // Orange
+
+      // Re-add column headers for clarity? Or just continue list? 
+      // User said "bawah nya ots semua dan atas full po jadi kasih space". 
+      // Let's just create a separator header is enough.
+
+      addOrderRows(otsOrders)
+    }
+
+    // 4. Calculate Stats (Member Sales) - Only from PAID orders (checked/completed)
+    const memberStats = {}
+    const paidOrders = orders.filter(o => o.status === 'checked' || o.status === 'completed')
+
+    paidOrders.forEach(order => {
+      order.order_items.forEach(item => {
+        let name = item.item_name
+          .replace('Cheki ', '')
+          .replace(' (Pre-Order)', '')
+          .trim()
+
+        if (name.toLowerCase().includes('all member') || name.toLowerCase().includes('group')) {
+          name = 'All Member (Group)'
         }
+
+        if (!memberStats[name]) memberStats[name] = { qty: 0, revenue: 0 }
+
+        memberStats[name].qty += item.quantity
+        memberStats[name].revenue += (item.price * item.quantity)
       })
     })
 
-    // Calculate total revenue
-    const totalRevenue = orders.reduce((sum, order) => sum + (order.total_harga || 0), 0)
-    const totalOrders = orders.length
+    // 5. Add Summary Section
+    worksheet.addRow([])
+    worksheet.addRow([])
 
-    // Add summary section
-    worksheet.addRow([]) // Empty row
     const summaryStartRow = worksheet.rowCount + 1
-    
-    worksheet.addRow(['RINGKASAN', '', '', '', '', '', '', '', '', ''])
-    worksheet.addRow(['Total Orders:', totalOrders, '', '', '', '', '', '', '', ''])
-    worksheet.addRow(['Total Pendapatan:', `Rp ${totalRevenue.toLocaleString('id-ID')}`, '', '', '', '', '', '', '', ''])
+    const titleRow = worksheet.addRow(['RINGKASAN PENJUALAN', '', '', '', '', '', '', '', '', ''])
+    titleRow.font = { bold: true, size: 14 }
+    titleRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E293B' } } // Slate-800
+    titleRow.eachCell(cell => cell.font = { bold: true, color: { argb: 'FFFFFFFF' } })
 
-    // Style summary section
-    const summaryHeaderRow = worksheet.getRow(summaryStartRow)
-    summaryHeaderRow.font = { bold: true, size: 12 }
-    summaryHeaderRow.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: 'FFE8F5E9' }
-    }
+    // Summary Headers
+    const summaryHeader = worksheet.addRow(['Member / Item', 'Total Qty', 'Total Rupiah', '', '', '', '', '', '', ''])
+    summaryHeader.font = { bold: true }
+    summaryHeader.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } }
+    summaryHeader.getCell(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } }
+    summaryHeader.getCell(3).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } }
 
-    // Bold summary labels
-    worksheet.getRow(summaryStartRow + 1).getCell(1).font = { bold: true }
-    worksheet.getRow(summaryStartRow + 2).getCell(1).font = { bold: true }
-    worksheet.getRow(summaryStartRow + 2).getCell(2).font = { bold: true, color: { argb: 'FF079108' }, size: 12 }
+    let totalQty = 0
+    let totalRev = 0
+
+    // Sort stats: Group last, others alpha or by value? Let's do alphabetical for members
+    const sortedKeys = Object.keys(memberStats).sort()
+
+    sortedKeys.forEach(key => {
+      const { qty, revenue } = memberStats[key]
+      totalQty += qty
+      totalRev += revenue
+
+      const row = worksheet.addRow([key, qty, `Rp ${revenue.toLocaleString('id-ID')}`, '', '', '', '', '', '', ''])
+      row.getCell(1).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+      row.getCell(2).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+      row.getCell(3).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }
+    })
+
+    // Grand Total Row
+    const grandTotalRow = worksheet.addRow(['GRAND TOTAL', totalQty, `Rp ${totalRev.toLocaleString('id-ID')}`, '', '', '', '', '', '', ''])
+    grandTotalRow.font = { bold: true }
+    grandTotalRow.getCell(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } } // Light green
+    grandTotalRow.getCell(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } }
+    grandTotalRow.getCell(3).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDCFCE7' } }
 
     // Set response headers
-    res.setHeader(
-      'Content-Type',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=RefreshBreeze_Orders_${Date.now()}.xlsx`
-    )
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    res.setHeader('Content-Disposition', `attachment; filename=RefreshBreeze_Orders_${Date.now()}.xlsx`)
 
-    // Write to response
     await workbook.xlsx.write(res)
     res.end()
+
   } catch (error) {
     console.error('Error exporting to Excel:', error)
     res.status(500).json({ error: error.message })
@@ -416,7 +463,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 router.post('/bulk-delete', authMiddleware, async (req, res) => {
   try {
     const { deleteType, eventId, weeks, months } = req.body
-    
+
     console.log('🗑️ Bulk delete request:', { deleteType, eventId, weeks, months })
 
     let query = supabase.from('orders').select('id')
@@ -438,7 +485,7 @@ router.post('/bulk-delete', authMiddleware, async (req, res) => {
 
     // Get orders to delete
     const { data: ordersToDelete, error: selectError } = await query
-    
+
     if (selectError) throw selectError
 
     if (!ordersToDelete || ordersToDelete.length === 0) {
@@ -465,10 +512,10 @@ router.post('/bulk-delete', authMiddleware, async (req, res) => {
 
     console.log(`✅ Deleted ${ordersToDelete.length} orders`)
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: `Successfully deleted ${ordersToDelete.length} orders`,
-      count: ordersToDelete.length 
+      count: ordersToDelete.length
     })
   } catch (error) {
     console.error('Error bulk deleting orders:', error)

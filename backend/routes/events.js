@@ -88,7 +88,7 @@ router.get('/:id', async (req, res) => {
 // POST: Create new event (admin only)
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { nama, tanggal, bulan, tahun, lokasi, event_time, cheki_time, is_past, lineup } = req.body
+    const { nama, tanggal, bulan, tahun, lokasi, event_time, cheki_time, is_past, is_special, theme_name, theme_color, lineup } = req.body
 
     // Insert event
     const { data: event, error: eventError } = await supabase
@@ -101,7 +101,10 @@ router.post('/', authMiddleware, async (req, res) => {
         lokasi,
         event_time,
         cheki_time,
-        is_past
+        is_past,
+        is_special: is_special || false,
+        theme_name: is_special ? theme_name : null,
+        theme_color: is_special ? theme_color : null
       })
       .select()
       .single()

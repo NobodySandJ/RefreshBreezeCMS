@@ -1,67 +1,89 @@
-import { FaYoutube, FaInstagram } from 'react-icons/fa'
 import { Link } from 'react-router-dom'
+import Tilt from 'react-parallax-tilt'
+import { FaInstagram, FaTwitter, FaYoutube, FaMapMarkerAlt, FaEnvelope, FaTiktok } from 'react-icons/fa'
 
 const Footer = () => {
   return (
-    <footer className="bg-gradient-to-br from-custom-green via-green-600 to-green-700 text-center py-16 mt-20 border-t-4 border-custom-green relative overflow-hidden">
-      {/* Decorative Background Elements */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-10 left-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 right-10 w-60 h-60 bg-white rounded-full blur-3xl"></div>
-      </div>
+    <footer className="bg-gray-50 text-gray-900 py-12 sm:py-16 px-4 border-t border-gray-200 font-sans">
+      <div className="container mx-auto max-w-7xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 lg:gap-20">
+          
+          {/* COL 1: IDENTITY */}
+          <div className="space-y-6">
+            <h3 className="text-2xl font-black tracking-widest uppercase text-dark">
+              REFRESH BREEZE
+            </h3>
+            <p className="text-gray-500 text-sm font-medium leading-relaxed max-w-md">
+              Membawa gelombang energi baru melalui penampilan idola gaya Jepang yang unik di Tulungagung.
+            </p>
+            <p className="text-[#079108] font-bold text-xs tracking-widest">
+              リフレッシュ・ブリーズ
+            </p>
+          </div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        <div 
-          className="text-4xl md:text-5xl font-black text-white mb-4 tracking-widest drop-shadow-lg"
-          data-aos="fade-up"
-          data-aos-duration="800"
-        >
-          REFRESH BREEZE
+          {/* COL 2: QUICK LINKS */}
+          <div className="space-y-6">
+            <h4 className="text-lg font-bold text-dark">Quick Links</h4>
+            <ul className="space-y-4">
+              {[
+                { name: 'About Us', href: '/#about' },
+                { name: 'Members', href: '/members' },
+                { name: 'Discography', href: '/music' },
+                { name: 'Schedule', href: '/schedule' },
+                { name: 'Shop', href: '/shop' }
+              ].map(link => (
+                <li key={link.name}>
+                  <Link to={link.href} className="text-gray-500 hover:text-[#079108] text-sm font-medium transition-colors">
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* COL 3: GET IN TOUCH */}
+          <div className="space-y-6">
+             <h4 className="text-lg font-bold text-dark">Get in Touch</h4>
+             <div className="space-y-4">
+                <div className="flex items-start gap-4 text-gray-500 text-sm">
+                   <div className="mt-1 min-w-[1rem]"><FaMapMarkerAlt /></div>
+                   <span>Tulungagung, Jawa Timur, Indonesia</span>
+                </div>
+                <div className="flex items-center gap-4 text-gray-500 text-sm">
+                   <div className="min-w-[1rem]"><FaEnvelope /></div>
+                   <a href="mailto:official.refreshbreeze@gmail.com" className="hover:text-[#079108] transition-colors">official.refreshbreeze@gmail.com</a>
+                </div>
+             </div>
+
+             <div className="flex gap-4 pt-2">
+                {[
+                  { icon: <FaInstagram />, href: 'https://instagram.com/refbreeze' },
+                  { icon: <FaTwitter />, href: 'https://twitter.com/ref_breeze' },
+                  { icon: <FaYoutube />, href: 'https://youtube.com/@RefreshBreeze' },
+                  { icon: <FaTiktok />, href: 'https://tiktok.com/@refbreeze' },
+                ].map((social, idx) => (
+                  <a 
+                    key={idx}
+                    href={social.href} 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:bg-[#079108] hover:border-[#079108] hover:text-white transition-all duration-300"
+                  >
+                    {social.icon}
+                  </a>
+                ))}
+             </div>
+          </div>
+
         </div>
-        <p 
-          className="text-white/90 text-base md:text-lg mb-8 font-medium"
-          data-aos="fade-up"
-          data-aos-duration="800"
-          data-aos-delay="100"
-        >
-          Angin Segar dari Tulungagung 🌿
-        </p>
-        
-        <div 
-          className="flex justify-center gap-6 mb-8"
-          data-aos="fade-up"
-          data-aos-duration="800"
-          data-aos-delay="200"
-        >
-          <a
-            href="https://www.youtube.com/@refreshbreeze"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-white/20 backdrop-blur-sm text-white hover:bg-white hover:text-custom-green p-4 rounded-2xl text-4xl transition-all transform hover:scale-110 hover:rotate-6 shadow-lg"
-          >
-            <FaYoutube />
-          </a>
-          <a
-            href="https://www.instagram.com/refbreeze/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-white/20 backdrop-blur-sm text-white hover:bg-white hover:text-pink-600 p-4 rounded-2xl text-4xl transition-all transform hover:scale-110 hover:-rotate-6 shadow-lg"
-          >
-            <FaInstagram />
-          </a>
+
+        <div className="mt-16 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-gray-400 font-medium">
+          <p>© 2026 REFRESH BREEZE. ALL RIGHTS RESERVED.</p>
+          <div className="flex gap-8">
+             <Link to="/admin/login" className="hover:text-[#079108] transition-colors">Staff Login</Link>
+             <a href="#" className="hover:text-[#079108] transition-colors">Privacy Policy</a>
+          </div>
         </div>
-
-        <div className="h-px bg-white/30 max-w-xl mx-auto mb-6"></div>
-
-        <p className="text-white/80 text-sm mb-3">© 2026 Refresh Breeze. All rights reserved.</p>
-        
-        {/* Hidden Admin Link */}
-        <Link 
-          to="/admin/login"
-          className="inline-block text-xs text-white/50 hover:text-white transition-colors hover:underline"
-        >
-          Staff Access
-        </Link>
       </div>
     </footer>
   )

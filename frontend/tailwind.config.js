@@ -14,8 +14,15 @@ export default {
         'custom-sage': '#b8dfd8',
         'custom-cream': '#fdfdf8',
         'custom-ivory': '#faf9f5',
+        'bg-dark': '#0a0f1d',
+        'dark': '#0a0f1d',
+        'bg-card': '#111827',
+        'accent-yellow': '#fbbf24',
+        'accent-blue': '#38bdf8',
+        'accent-emerald': '#10b981',
       },
       fontFamily: {
+        'sans': ['Poppins', 'sans-serif'],
         'poppins': ['Poppins', 'sans-serif'],
         'marker': ['Permanent Marker', 'cursive'],
       },
@@ -23,6 +30,7 @@ export default {
         'gradient-green': 'linear-gradient(135deg, #079108 0%, #10b114 100%)',
         'gradient-green-light': 'linear-gradient(135deg, #c3e3a3 0%, #b8dfd8 100%)',
         'gradient-green-radial': 'radial-gradient(circle, #079108 0%, #065906 100%)',
+        'gradient-dark': 'linear-gradient(180deg, #0a0f1d 0%, #0f172a 100%)',
       },
       animation: {
         'pulse-custom': 'pulse-custom 2s infinite cubic-bezier(0.4, 0, 0.6, 1)',
@@ -31,6 +39,7 @@ export default {
         'float': 'float 3s ease-in-out infinite',
         'gradient-x': 'gradient-x 3s ease infinite',
         'bounce-slow': 'bounce 3s infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
       },
       keyframes: {
         'pulse-custom': {
@@ -53,6 +62,10 @@ export default {
           '0%, 100%': { backgroundPosition: '0% 50%' },
           '50%': { backgroundPosition: '100% 50%' },
         },
+        glow: {
+          'from': { 'box-shadow': '0 0 5px #38bdf8, 0 0 10px #38bdf8' },
+          'to': { 'box-shadow': '0 0 15px #38bdf8, 0 0 25px #0ea5e9' },
+        }
       },
     },
   },
