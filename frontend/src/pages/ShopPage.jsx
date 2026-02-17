@@ -122,9 +122,9 @@ const ShopPage = () => {
   const hargaMember = Number(config?.hargaChekiPerMember) || 25000
   const hargaGrup = Number(config?.hargaChekiGrup) || 30000
   const payment = {
-    bank: config?.paymentInfo_bank || "BCA",
-    rekening: config?.paymentInfo_rekening || "8162015779",
-    atasNama: config?.paymentInfo_atasNama || "Reyhan Alfa Sukmajati"
+    bank: "BCA",
+    rekening: "0902683273",
+    atasNama: "Natasya Angelina Putri"
   }
 
   // Cart Logic

@@ -138,8 +138,8 @@ INSERT INTO config (key, value)
 VALUES ('harga_cheki_per_member', '25000'),
     ('harga_cheki_grup', '30000'),
     ('payment_bank', 'BCA'),
-    ('payment_rekening', '8162015779'),
-    ('payment_atas_nama', 'Reyhan Alfa Sukmajati');
+    ('payment_rekening', '0902683273'),
+    ('payment_atas_nama', 'Natasya Angelina Putri');
 
 -- ============================================
 -- TABLE: faqs
