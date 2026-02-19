@@ -100,7 +100,7 @@ router.get('/:id', authMiddleware, async (req, res) => {
 // POST: Create new order (from customer)
 router.post('/', async (req, res) => {
   try {
-    const { event_id, nama_lengkap, kontak, items, payment_proof_url } = req.body
+    const { event_id, nama_lengkap, kontak, items, payment_proof_url, catatan } = req.body
 
     // Validate event_id
     if (!event_id) {
@@ -134,7 +134,8 @@ router.post('/', async (req, res) => {
         total_harga,
         payment_proof_url,
         status: 'pending',
-        created_by: 'customer'
+        created_by: 'customer',
+        catatan: catatan || null
       })
       .select()
       .single()
@@ -299,6 +300,7 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
       { header: 'Instagram', key: 'instagram', width: 20 },
       { header: 'Items', key: 'items', width: 45 },
       { header: 'Total Harga', key: 'total_harga', width: 18 },
+      { header: 'Catatan', key: 'catatan', width: 30 },
       { header: 'Status', key: 'status', width: 12 },
       { header: 'Tanggal Order', key: 'created_at', width: 20 },
       // Extra columns for summary if needed, but we'll specific cells
@@ -328,6 +330,7 @@ router.get('/export/excel', authMiddleware, async (req, res) => {
           instagram: order.instagram || '-',
           items: itemsText,
           total_harga: order.total_harga,
+          catatan: order.catatan || '-',
           status: order.status,
           created_at: new Date(order.created_at).toLocaleString('id-ID'),
         })

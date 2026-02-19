@@ -1,0 +1,27 @@
+name: Supabase Keep Alive
+
+on:
+  schedule:
+    # Run at 00:00 every 3 days
+    - cron: "0 0 */3 * *"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install @supabase/supabase-js
+
+      - name: Run Keep Alive script
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        run: node scripts/keepAlive.js

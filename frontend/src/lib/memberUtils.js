@@ -14,16 +14,16 @@ export const memberData = {
         gradient: 'from-green-400 to-emerald-500',
     },
     'cissi': {
-        color: '#F472B6',
+        color: '#FBBF24',
         emoji: '👑',
         name: 'Cissi',
-        gradient: 'from-pink-400 to-rose-500',
+        gradient: 'from-amber-400 to-yellow-500',
     },
     'channie': {
-        color: '#34D399',
+        color: '#6D28D9',
         emoji: '✨',
         name: 'Channie',
-        gradient: 'from-emerald-400 to-green-500',
+        gradient: 'from-purple-600 to-indigo-600',
     },
     'acaa': {
         color: '#3B82F6',
@@ -32,16 +32,16 @@ export const memberData = {
         gradient: 'from-blue-500 to-blue-600',
     },
     'cally': {
-        color: '#A78BFA',
+        color: '#34D399',
         emoji: '🪼',
         name: 'Cally',
-        gradient: 'from-violet-400 to-purple-500',
+        gradient: 'from-emerald-400 to-green-500',
     },
     'piya': {
-        color: '#FBBF24',
+        color: '#F472B6',
         emoji: '🐰',
         name: 'Piya',
-        gradient: 'from-amber-400 to-yellow-500',
+        gradient: 'from-pink-400 to-rose-500',
     },
     'group': {
         color: '#079108',

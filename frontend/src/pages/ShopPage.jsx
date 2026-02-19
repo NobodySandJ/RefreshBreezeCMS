@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaShoppingCart, FaPlus, FaMinus, FaChevronRight, FaCamera, FaCheckCircle, FaRegCopy, FaTicketAlt, FaInfoCircle, FaSpinner, FaUniversity, FaTrash, FaCopy } from 'react-icons/fa'
+import { FaShoppingCart, FaPlus, FaMinus, FaChevronRight, FaCamera, FaCheckCircle, FaRegCopy, FaTicketAlt, FaInfoCircle, FaSpinner, FaUniversity, FaTrash, FaCopy, FaDownload } from 'react-icons/fa'
 import { getAssetPath } from '../lib/pathUtils'
 import api from '../lib/api'
 import Skeleton from '../components/Skeleton'
@@ -27,12 +27,14 @@ const ShopPage = () => {
     nama_panggilan: '',
     kontak: '',
     event_id: '',
+    catatan: '',
   })
   const [file, setFile] = useState(null)
   const [filePreview, setFilePreview] = useState(null)
   const [uploading, setUploading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(null)
+  const [receiptData, setReceiptData] = useState(null)
   const [eventDropdownOpen, setEventDropdownOpen] = useState(false)
   const fileInputRef = useRef(null)
   const [mobileCartOpen, setMobileCartOpen] = useState(false)
@@ -98,9 +100,9 @@ const ShopPage = () => {
         
         if (configRes.data.success) setConfig(configRes.data.data)
         if (membersRes.data.success) {
-           const heroOrder = ['cally', 'yanyee', 'channie', 'acaa', 'cissi', 'sinta', 'piya']
+           const heroOrder = ['cissi', 'acaa', 'channie', 'cally', 'sinta', 'piya']
            const sorted = membersRes.data.data
-             .filter(m => m.member_id !== 'group')
+             .filter(m => m.member_id !== 'group' && m.member_id !== 'yanyee')
              .sort((a, b) => {
                 const indexA = heroOrder.indexOf(a.member_id)
                 const indexB = heroOrder.indexOf(b.member_id)
@@ -141,15 +143,12 @@ const ShopPage = () => {
       image: imageUrl
     }
 
-    setCart(prev => {
-      const existing = prev.find(i => i.id === item.id)
-      if (existing) {
-        return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i)
-      }
-      return [...prev, item]
-    })
-
-    toast(
+    // Toast Logic (Side Effect outside of setState)
+    const existing = cart.find(i => i.id === item.id)
+    const newQty = existing ? existing.quantity + 1 : 1
+    
+    const toastId = `cart-${item.id}`
+    const toastContent = (
       <div className="flex items-center gap-4 px-6 py-3 bg-gray-900/95 backdrop-blur-xl rounded-full border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] min-w-[280px]">
         <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-xl shadow-inner border border-white/5">
           {isGroup ? '✨' : getMemberEmoji(member.id)}
@@ -158,47 +157,65 @@ const ShopPage = () => {
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 leading-none mb-1.5">Added to Cart</p>
           <div className="flex items-center gap-2">
             <p className="text-sm font-black text-white whitespace-nowrap">{item.name}</p>
-            <span className="text-white/40 text-[10px] font-bold">• {item.quantity}x</span>
+            <span className="text-white/40 text-[10px] font-bold">• {newQty}x</span>
           </div>
         </div>
-      </div>,
-      {
-        position: "bottom-center",
-        autoClose: 2500,
-        className: "!bg-transparent !p-0 !shadow-none min-h-0",
-        bodyClassName: "!p-0 !m-0",
-        closeButton: false,
-      }
+      </div>
     )
+
+    const toastOptions = {
+      toastId,
+      position: "bottom-center",
+      autoClose: 2500,
+      className: "!bg-transparent !p-0 !shadow-none min-h-0",
+      bodyClassName: "!p-0 !m-0",
+      closeButton: false,
+    }
+
+    if (toast.isActive(toastId)) {
+      toast.update(toastId, { render: toastContent, ...toastOptions })
+    } else {
+      toast(toastContent, toastOptions)
+    }
+
+    setCart(prev => {
+      const existingInPrev = prev.find(i => i.id === item.id)
+      if (existingInPrev) {
+        return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i)
+      }
+      return [...prev, item]
+    })
   }
 
   const updateQuantity = (id, delta) => {
+    // Check if removal is needed for toast
+    const item = cart.find(i => i.id === id)
+    if (item && item.quantity === 1 && delta === -1) {
+      // Toast for removal
+      toast(
+        <div className="flex items-center gap-4 px-6 py-3 bg-red-900/90 backdrop-blur-xl rounded-full border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] min-w-[280px]">
+          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-xl shadow-inner border border-white/5">
+            🗑️
+          </div>
+          <div className="flex flex-col">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400 leading-none mb-1.5">Removed from Cart</p>
+            <p className="text-sm font-black text-white whitespace-nowrap">{item.name}</p>
+          </div>
+        </div>,
+        {
+          position: "bottom-center",
+          autoClose: 2000,
+          className: "!bg-transparent !p-0 !shadow-none min-h-0",
+          bodyClassName: "!p-0 !m-0",
+          closeButton: false,
+        }
+      )
+    }
+
     setCart(prev => {
-      const item = prev.find(i => i.id === id)
-      if (item && item.quantity === 1 && delta === -1) {
-        // Remove item if minus clicked at quantity 1
-        const removedName = item.name
-        const newCart = prev.filter(i => i.id !== id)
-        
-        toast(
-          <div className="flex items-center gap-4 px-6 py-3 bg-red-900/90 backdrop-blur-xl rounded-full border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] min-w-[280px]">
-            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-xl shadow-inner border border-white/5">
-              🗑️
-            </div>
-            <div className="flex flex-col">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400 leading-none mb-1.5">Removed from Cart</p>
-              <p className="text-sm font-black text-white whitespace-nowrap">{removedName}</p>
-            </div>
-          </div>,
-          {
-            position: "bottom-center",
-            autoClose: 2000,
-            className: "!bg-transparent !p-0 !shadow-none min-h-0",
-            bodyClassName: "!p-0 !m-0",
-            closeButton: false,
-          }
-        )
-        return newCart
+      const itemInPrev = prev.find(i => i.id === id)
+      if (itemInPrev && itemInPrev.quantity === 1 && delta === -1) {
+        return prev.filter(i => i.id !== id)
       }
 
       return prev.map(item => {
@@ -212,30 +229,28 @@ const ShopPage = () => {
   }
 
   const removeFromCart = (id) => {
-    setCart(prev => {
-      const item = prev.find(i => i.id === id)
-      if (item) {
-        toast(
-          <div className="flex items-center gap-4 px-6 py-3 bg-red-900/90 backdrop-blur-xl rounded-full border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] min-w-[280px]">
-            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-xl shadow-inner border border-white/5">
-              🗑️
-            </div>
-            <div className="flex flex-col">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400 leading-none mb-1.5">Removed from Cart</p>
-              <p className="text-sm font-black text-white whitespace-nowrap">{item.name}</p>
-            </div>
-          </div>,
-          {
-            position: "bottom-center",
-            autoClose: 2000,
-            className: "!bg-transparent !p-0 !shadow-none min-h-0",
-            bodyClassName: "!p-0 !m-0",
-            closeButton: false,
-          }
-        )
-      }
-      return prev.filter(item => item.id !== id)
-    })
+    const item = cart.find(i => i.id === id)
+    if (item) {
+      toast(
+        <div className="flex items-center gap-4 px-6 py-3 bg-red-900/90 backdrop-blur-xl rounded-full border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] min-w-[280px]">
+          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-xl shadow-inner border border-white/5">
+            🗑️
+          </div>
+          <div className="flex flex-col">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400 leading-none mb-1.5">Removed from Cart</p>
+            <p className="text-sm font-black text-white whitespace-nowrap">{item.name}</p>
+          </div>
+        </div>,
+        {
+          position: "bottom-center",
+          autoClose: 2000,
+          className: "!bg-transparent !p-0 !shadow-none min-h-0",
+          bodyClassName: "!p-0 !m-0",
+          closeButton: false,
+        }
+      )
+    }
+    setCart(prev => prev.filter(item => item.id !== id))
   }
 
   const totalHarga = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
@@ -275,11 +290,26 @@ const ShopPage = () => {
         kontak: formData.kontak,
         event_id: formData.event_id,
         items: cart,
-        payment_proof_url: uploadRes.data.data.url
+        payment_proof_url: uploadRes.data.data.url,
+        catatan: formData.catatan || null
       }
       
       const orderRes = await api.post('/orders', orderData)
       if (orderRes.data.success) {
+        // Save receipt data before clearing cart
+        const selectedEvent = events.find(e => e.id === formData.event_id)
+        setReceiptData({
+          orderNumber: orderRes.data.order.order_number,
+          eventName: selectedEvent?.nama || '-',
+          eventDate: selectedEvent ? `${selectedEvent.tanggal} ${selectedEvent.bulan} ${selectedEvent.tahun}` : '-',
+          items: cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price })),
+          nama: formData.nama_panggilan,
+          kontak: formData.kontak,
+          catatan: formData.catatan || '',
+          total: totalHarga,
+          paymentProofName: file?.name || '-',
+          createdAt: new Date().toLocaleString('id-ID')
+        })
         setOrderSuccess(orderRes.data.order)
         setCart([])
         setFilePreview(null)
@@ -857,7 +887,20 @@ const ShopPage = () => {
                               </AnimatePresence>
                            </div>
                         </div>
-                    </div>
+                        </div>
+
+                        {/* Catatan (Optional) */}
+                        <div className="space-y-2">
+                           <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Catatan <span className="normal-case font-semibold tracking-normal">(opsional)</span></label>
+                           <textarea 
+                              value={formData.catatan}
+                              onChange={e => setFormData({...formData, catatan: e.target.value})}
+                              className="w-full bg-gray-50/80 border-2 border-gray-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 font-bold text-sm sm:text-base focus:outline-none focus:border-[#079108] focus:bg-white transition-all resize-none"
+                              placeholder="Contoh: saya tidak bisa hadir, tolong dikirim ya / ambil di event (COD)"
+                              rows={3}
+                           />
+                           <p className="text-[10px] text-gray-400 ml-2 italic">NB: Catatan bersifat opsional. Bisa diisi jika kamu tidak bisa hadir di event, ingin cheki dikirim, atau ambil langsung (COD) di lokasi.</p>
+                        </div>
 
                      <div className="space-y-6">
                         {/* Payment Information Card */}
@@ -999,26 +1042,235 @@ const ShopPage = () => {
                  <FaCheckCircle className="text-5xl" />
               </motion.div>
               <h2 className="text-4xl font-black uppercase tracking-widest mb-4 bg-gradient-to-r from-gray-900 to-[#079108] bg-clip-text text-transparent">Order Success!</h2>
-              <p className="text-gray-500 mb-8">Terima kasih! Pesananmu telah tersimpan.</p>
+              <p className="text-gray-500 mb-8">Terima kasih! Berikut adalah nota pemesananmu:</p>
               
-              <div className="bg-white/80 backdrop-blur-xl border-2 border-dashed border-[#079108]/30 p-8 rounded-3xl mb-8 shadow-lg">
-                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Order ID</p>
-                 <p className="text-3xl font-black text-[#079108] tracking-widest select-all">{orderSuccess.order_number}</p>
-              </div>
+              {/* Receipt Preview */}
+              {receiptData && (
+                <div className="mb-8 flex flex-col items-center">
+                   <div className="rounded-xl overflow-hidden shadow-2xl border border-gray-200">
+                      <canvas 
+                        id="receipt-canvas"
+                        className="max-w-full h-auto bg-white"
+                        style={{ maxWidth: '350px' }}
+                      />
+                   </div>
+                   <p className="text-[10px] text-gray-400 mt-2 italic">Preview nota otomatis di-generate</p>
+                   
+                   {/* Draw Canvas Effect */}
+                   <ReceiptDrawer receiptData={receiptData} />
+                </div>
+              )}
 
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => navigate('/')}
-                className="px-10 py-4 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full font-black uppercase text-xs tracking-widest hover:from-[#079108] hover:to-emerald-600 transition-all shadow-xl"
-              >
-                 Return Home
-              </motion.button>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                {receiptData && (
+                  <motion.button 
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                       const canvas = document.getElementById('receipt-canvas')
+                       if (canvas) {
+                          const link = document.createElement('a')
+                          link.download = `Nota_${receiptData.orderNumber}.png`
+                          link.href = canvas.toDataURL('image/png')
+                          link.click()
+                       }
+                    }}
+                    className="px-8 py-4 bg-gradient-to-r from-[#079108] to-emerald-500 text-white rounded-full font-black uppercase text-xs tracking-widest hover:shadow-xl hover:shadow-[#079108]/30 transition-all flex items-center gap-3"
+                  >
+                    <FaDownload /> Download Nota
+                  </motion.button>
+                )}
+
+                <motion.button 
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate('/')}
+                  className="px-10 py-4 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full font-black uppercase text-xs tracking-widest hover:from-gray-700 hover:to-gray-600 transition-all shadow-xl"
+                >
+                   Return Home
+                </motion.button>
+              </div>
            </motion.div>
         )}
       </main>
     </div>
   )
+}
+
+// Helper component to handle canvas drawing
+const ReceiptDrawer = ({ receiptData }) => {
+  useEffect(() => {
+    const canvas = document.getElementById('receipt-canvas')
+    if (!canvas || !receiptData) return
+
+    const ctx = canvas.getContext('2d')
+    const W = 500
+    const pad = 30
+    const lineH = 22
+    const rd = receiptData
+    
+    // Load logo first
+    const logo = new Image()
+    logo.src = '/images/logos/logo.webp'
+    
+    // Draw logic function
+    const draw = () => {
+        // Pre-calculate height
+        let totalLines = 0
+        totalLines += 8 // header info
+        totalLines += 1 // separator
+        totalLines += rd.items.length // items
+        totalLines += 2 // separator + total
+        totalLines += 6 // payment info (Method + Bank + Rek + An)
+        if (rd.catatan) totalLines += 2
+        totalLines += 2 // footer padding
+        totalLines += 3 // thank you + IG
+
+        const H = 100 + (pad * 2) + (totalLines * lineH) + 100 
+        canvas.width = W
+        canvas.height = H
+
+        // Background
+        ctx.fillStyle = '#FFFFFF'
+        ctx.fillRect(0, 0, W, H)
+
+        let y = pad + 20
+
+        // Helper functions
+        const drawText = (text, x, size, color = '#000000', align = 'left', weight = 'normal', font = 'Courier New') => {
+          ctx.fillStyle = color
+          ctx.font = `${weight} ${size}px ${font}`
+          ctx.textAlign = align
+          ctx.fillText(text, x, y)
+        }
+
+        const drawDashedLine = () => {
+          ctx.setLineDash([5, 5])
+          ctx.strokeStyle = '#000000'
+          ctx.lineWidth = 1.5
+          ctx.beginPath()
+          ctx.moveTo(pad, y)
+          ctx.lineTo(W - pad, y)
+          ctx.stroke()
+          ctx.setLineDash([])
+          y += lineH
+        }
+
+        // ====== LOGO & HEADER ======
+        const logoW = 80
+        const logoH = 80 * (logo.height / logo.width)
+        ctx.drawImage(logo, (W - logoW) / 2, y, logoW, logoH)
+        y += logoH + 20
+
+        drawText('REFRESH BREEZE', W / 2, 24, '#000000', 'center', 'bold')
+        y += lineH + 5
+        drawText('Official Store', W / 2, 14, '#000000', 'center', 'normal')
+        y += lineH + 5
+        
+        ctx.strokeStyle = '#000000'
+        ctx.lineWidth = 2
+        const boxW = 280
+        const boxH = 34
+        ctx.strokeRect((W - boxW) / 2, y, boxW, boxH)
+        y += 24
+        drawText(rd.orderNumber, W / 2, 16, '#000000', 'center', 'bold')
+        y += lineH + 10
+
+        drawDashedLine()
+        
+        // ====== INFO ======
+        drawText(rd.createdAt, pad, 12, '#000000', 'left', 'normal')
+        drawText('Admin', W - pad, 12, '#000000', 'right', 'normal')
+        y += lineH
+        drawText(`Event: ${rd.eventName}`, pad, 12, '#000000', 'left', 'normal')
+        y += lineH
+
+        drawDashedLine()
+
+        // ====== ITEMS ======
+        rd.items.forEach(item => {
+          drawText(item.name, pad, 12, '#000000', 'left', 'bold')
+          y += lineH - 4
+          drawText(`${item.quantity} x ${item.price.toLocaleString('id-ID')}`, pad + 20, 12, '#000000', 'left', 'normal')
+          drawText(`Rp ${(item.price * item.quantity).toLocaleString('id-ID')}`, W - pad, 12, '#000000', 'right', 'normal')
+          y += lineH + 4
+        })
+
+        drawDashedLine()
+
+        // ====== TOTAL ======
+        drawText('Total QTY:', pad, 12, '#000000', 'left', 'normal')
+        drawText(rd.items.reduce((acc, i) => acc + i.quantity, 0).toString(), W - pad, 12, '#000000', 'right', 'normal')
+        y += lineH
+        
+        drawText('Sub Total', pad, 12, '#000000', 'left', 'normal')
+        drawText(`Rp ${rd.total.toLocaleString('id-ID')}`, W - pad, 12, '#000000', 'right', 'normal')
+        y += lineH + 5
+        
+        drawText('TOTAL', pad, 20, '#000000', 'left', 'bold')
+        drawText(`Rp ${rd.total.toLocaleString('id-ID')}`, W - pad, 20, '#000000', 'right', 'bold')
+        y += lineH + 10
+        
+        drawText('Metode Bayar', pad, 12, '#000000', 'left', 'normal')
+        drawText('Transfer', W - pad, 12, '#000000', 'right', 'normal')
+        y += lineH
+
+        // Transfer Details
+        drawText('Bank', pad, 12, '#000000', 'left', 'normal')
+        drawText('BCA', W - pad, 12, '#000000', 'right', 'normal')
+        y += lineH
+        drawText('No. Rek', pad, 12, '#000000', 'left', 'normal')
+        drawText('8162015779', W - pad, 12, '#000000', 'right', 'normal')
+        y += lineH
+        drawText('A/n', pad, 12, '#000000', 'left', 'normal')
+        drawText('REYHAN ALFA SUKMAJATI', W - pad, 12, '#000000', 'right', 'normal')
+        y += lineH
+
+        drawDashedLine()
+
+        // ====== CUSTOMER ======
+        drawText('Nama  :', pad, 12, '#000000', 'left', 'normal')
+        drawText(rd.nama || '-', pad + 80, 12, '#000000', 'left', 'bold')
+        y += lineH
+        drawText('Kontak:', pad, 12, '#000000', 'left', 'normal')
+        drawText(rd.kontak || '-', pad + 80, 12, '#000000', 'left', 'normal')
+        y += lineH
+        
+        if (rd.catatan) {
+           drawText('Catatan:', pad, 12, '#000000', 'left', 'normal')
+           y += lineH
+           const words = rd.catatan.split(' ')
+           let line = ''
+           words.forEach(word => {
+             if (ctx.measureText(line + word).width > W - (pad * 2)) {
+               drawText(line, pad, 12, '#000000', 'left', 'italic')
+               line = word + ' '
+               y += lineH
+             } else {
+               line += word + ' '
+             }
+           })
+           drawText(line, pad, 12, '#000000', 'left', 'italic')
+           y += lineH
+        }
+        
+        drawDashedLine()
+        
+        // ====== FOOTER ======
+        y += 10
+        drawText('Terima kasih telah berbelanja', W / 2, 14, '#000000', 'center', 'normal')
+        y += lineH
+        drawText('IG: @refreshbreeze', W / 2, 14, '#000000', 'center', 'bold')
+        y += lineH
+    }
+
+    logo.onload = draw
+    // Fallback if logo fails or is cached? Just draw anyway
+    if (logo.complete) draw()
+
+  }, [receiptData])
+
+  return null
 }
 
 export default ShopPage

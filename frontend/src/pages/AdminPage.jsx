@@ -42,7 +42,8 @@ import {
   FaCheck,
   FaTimes,
   FaImage,
-  FaChartBar
+  FaChartBar,
+  FaDownload
 } from 'react-icons/fa'
 
 // Helper to strip emojis and special symbols (cause grouping issues)
@@ -181,7 +182,8 @@ const AdminPage = () => {
   const fetchMembers = async () => {
     try {
       const response = await api.get('/members')
-      setMembers(response.data.data || [])
+      const allMembers = response.data.data || []
+      setMembers(allMembers.filter(m => m.member_id !== 'yanyee'))
     } catch (error) {
       console.error('Error fetching members:', error)
     }
@@ -1356,6 +1358,7 @@ const AdminPage = () => {
       {showOrderDetailModal && selectedOrder && (
         <OrderDetailModal 
           order={selectedOrder} 
+          events={events}
           onClose={() => {
             setShowOrderDetailModal(false)
             setSelectedOrder(null)
@@ -1510,6 +1513,11 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, onView,
                             <span className="text-gray-500"> x{item.quantity}</span>
                           </div>
                         )) || <span className="text-gray-400">No items</span>}
+                        {order.catatan && (
+                          <div className="mt-1 text-[10px] text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1 max-w-[250px] truncate" title={order.catatan}>
+                            📝 {order.catatan}
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-sm">
@@ -1587,12 +1595,211 @@ const RenderTable = ({ data, title, icon, emptyMessage, action, loading, onView,
 }
 
 // Order Detail Modal Component
-const OrderDetailModal = ({ order, onClose }) => {
+const OrderDetailModal = ({ order, events, onClose }) => {
+  const generateReceipt = () => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    const W = 500
+    const pad = 30
+    const lineH = 22
+
+    // Find event details
+    const selectedEvent = events.find(e => e.id === order.event_id)
+    const eventName = selectedEvent?.nama || order.event_name || '-' // Fallback if event_name stored
+
+    // Prepare items
+    const items = order.order_items || []
+
+    const logo = new Image()
+    logo.src = '/images/logos/logo.webp'
+
+    logo.onload = () => {
+      // Pre-calculate height
+      let totalLines = 0
+      totalLines += 8 // header info
+      totalLines += 1 // separator
+      totalLines += items.length // items
+      totalLines += 3 // separator + payment
+      totalLines += 6 // payment info (Method + Bank + Rek + An)
+      if (order.catatan) totalLines += 2
+      totalLines += 2 // footer padding
+      totalLines += 3 // thank you + IG
+
+      const H = 100 + (pad * 2) + (totalLines * lineH) + 100 // Extra buffer
+      canvas.width = W
+      canvas.height = H
+
+      // Background
+      ctx.fillStyle = '#FFFFFF'
+      ctx.fillRect(0, 0, W, H)
+
+      let y = pad + 20
+
+      // Helper functions
+      const drawText = (text, x, size, color = '#000000', align = 'left', weight = 'normal', font = 'Courier New') => {
+        ctx.fillStyle = color
+        ctx.font = `${weight} ${size}px ${font}`
+        ctx.textAlign = align
+        ctx.fillText(text, x, y)
+      }
+
+      const drawDashedLine = () => {
+        ctx.setLineDash([5, 5])
+        ctx.strokeStyle = '#000000'
+        ctx.lineWidth = 1.5
+        ctx.beginPath()
+        ctx.moveTo(pad, y)
+        ctx.lineTo(W - pad, y)
+        ctx.stroke()
+        ctx.setLineDash([])
+        y += lineH
+      }
+
+      // ====== LOGO & HEADER ======
+      const logoW = 80
+      const logoH = 80 * (logo.height / logo.width)
+      ctx.drawImage(logo, (W - logoW) / 2, y, logoW, logoH)
+      y += logoH + 20
+
+      drawText('REFRESH BREEZE', W / 2, 24, '#000000', 'center', 'bold')
+      y += lineH + 5
+      drawText('Official Store', W / 2, 14, '#000000', 'center', 'normal')
+      y += lineH + 5
+
+      // Boxed Order Number
+      ctx.strokeStyle = '#000000'
+      ctx.lineWidth = 2
+      const boxW = 280
+      const boxH = 34
+      ctx.strokeRect((W - boxW) / 2, y, boxW, boxH)
+      y += 24
+      drawText(order.order_number, W / 2, 16, '#000000', 'center', 'bold')
+      y += lineH + 10
+
+      drawDashedLine()
+
+      // ====== INFO ======
+      const dateStr = new Date(order.created_at).toLocaleString('id-ID')
+      drawText(dateStr, pad, 12, '#000000', 'left', 'normal')
+      drawText('Admin', W - pad, 12, '#000000', 'right', 'normal')
+      y += lineH
+      drawText(`Event: ${eventName}`, pad, 12, '#000000', 'left', 'normal')
+      y += lineH
+
+      drawDashedLine()
+
+      // ====== ITEMS ======
+      items.forEach(item => {
+        drawText(item.item_name, pad, 12, '#000000', 'left', 'bold')
+        y += lineH - 4
+        
+        drawText(`${item.quantity} x ${item.price.toLocaleString('id-ID')}`, pad + 20, 12, '#000000', 'left', 'normal')
+        drawText(`Rp ${(item.price * item.quantity).toLocaleString('id-ID')}`, W - pad, 12, '#000000', 'right', 'normal')
+        y += lineH + 4
+      })
+
+      drawDashedLine()
+
+      // ====== TOTAL ======
+      drawText('Total QTY:', pad, 12, '#000000', 'left', 'normal')
+      const totalQty = items.reduce((acc, i) => acc + i.quantity, 0)
+      drawText(totalQty.toString(), W - pad, 12, '#000000', 'right', 'normal')
+      y += lineH
+      
+      drawText('Sub Total', pad, 12, '#000000', 'left', 'normal')
+      drawText(`Rp ${order.total_harga.toLocaleString('id-ID')}`, W - pad, 12, '#000000', 'right', 'normal')
+      y += lineH + 5
+      
+      drawText('TOTAL', pad, 20, '#000000', 'left', 'bold')
+      drawText(`Rp ${order.total_harga.toLocaleString('id-ID')}`, W - pad, 20, '#000000', 'right', 'bold')
+      y += lineH + 10
+      
+      drawText('Metode Bayar', pad, 12, '#000000', 'left', 'normal')
+      drawText(order.is_ots ? 'Cash/QRIS' : 'Transfer', W - pad, 12, '#000000', 'right', 'normal')
+      y += lineH
+
+      if (!order.is_ots) {
+        // Transfer Details
+        drawText('Bank', pad, 12, '#000000', 'left', 'normal')
+        drawText('BCA', W - pad, 12, '#000000', 'right', 'normal')
+        y += lineH
+        drawText('No. Rek', pad, 12, '#000000', 'left', 'normal')
+        drawText('8162015779', W - pad, 12, '#000000', 'right', 'normal')
+        y += lineH
+        drawText('A/n', pad, 12, '#000000', 'left', 'normal')
+        drawText('REYHAN ALFA SUKMAJATI', W - pad, 12, '#000000', 'right', 'normal')
+        y += lineH
+      } else {
+         // Add blank space to keep consistency or just check if it's necessary
+         // But for OTS, we don't need to show transfer details. 
+         // Logic check: if is_ots, height calculation might be off if I added 6 unconditionally.
+         // Let's adjust logic below.
+      }
+
+      drawDashedLine()
+
+      // ====== CUSTOMER ======
+      drawText('Nama  :', pad, 12, '#000000', 'left', 'normal')
+      drawText(order.nama_lengkap || '-', pad + 80, 12, '#000000', 'left', 'bold')
+      y += lineH
+      drawText('Kontak:', pad, 12, '#000000', 'left', 'normal')
+      const kontak = order.whatsapp && order.whatsapp !== '-' ? order.whatsapp : order.instagram
+      drawText(kontak || '-', pad + 80, 12, '#000000', 'left', 'normal')
+      y += lineH
+      
+      if (order.catatan) {
+         drawText('Catatan:', pad, 12, '#000000', 'left', 'normal')
+         y += lineH
+         const words = order.catatan.split(' ')
+         let line = ''
+         words.forEach(word => {
+           if (ctx.measureText(line + word).width > W - (pad * 2)) {
+             drawText(line, pad, 12, '#000000', 'left', 'italic')
+             line = word + ' '
+             y += lineH
+           } else {
+             line += word + ' '
+           }
+         })
+         drawText(line, pad, 12, '#000000', 'left', 'italic')
+         y += lineH
+      }
+      
+      drawDashedLine()
+      
+      // ====== FOOTER ======
+      y += 10
+      drawText('Terima kasih telah berbelanja', W / 2, 14, '#000000', 'center', 'normal')
+      y += lineH
+      drawText('IG: @refreshbreeze', W / 2, 14, '#000000', 'center', 'bold')
+      y += lineH
+      
+      // Download
+      const link = document.createElement('a')
+      link.download = `Nota_${order.order_number}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    }
+    
+    logo.onerror = () => {
+      alert("Gagal memuat logo. Pastikan koneksi internet aman.")
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6 border-b flex justify-between items-center bg-custom-green text-white">
-          <h3 className="text-xl font-bold">Detail Order - {order.order_number}</h3>
+          <div className="flex items-center gap-4">
+            <h3 className="text-xl font-bold">Detail Order - {order.order_number}</h3>
+            <button 
+              onClick={generateReceipt}
+              className="bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2 transition-colors"
+              title="Download Nota"
+            >
+              <FaDownload /> Nota
+            </button>
+          </div>
           <button onClick={onClose} className="text-2xl hover:text-gray-200">
             <FaTimes />
           </button>
@@ -1636,6 +1843,15 @@ const OrderDetailModal = ({ order, onClose }) => {
               </span>
             </div>
           </div>
+
+          {order.catatan && (
+            <div className="border-t pt-4">
+              <h4 className="font-bold mb-2">📝 Catatan:</h4>
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <p className="text-sm text-gray-700 whitespace-pre-wrap">{order.catatan}</p>
+              </div>
+            </div>
+          )}
 
           {order.payment_proof_url && (
             <div className="border-t pt-4">
@@ -2077,18 +2293,28 @@ const EventModal = ({ members, onClose, onSuccess, editingEvent }) => {
           {/* Lineup */}
           <div>
             <label className="text-xs font-bold text-gray-600 block mb-1">Lineup ({formData.lineup?.length || 0})</label>
-            <div className="grid grid-cols-4 gap-1 max-h-20 overflow-y-auto border rounded-lg p-2 bg-gray-50">
-              {members.filter(m => m.member_id !== 'group').map((member) => (
-                <label key={member.id} className="flex items-center gap-1 text-xs cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={formData.lineup?.includes(member.id) || false}
-                    onChange={() => toggleMemberInLineup(member.id)}
-                    className="w-3 h-3"
-                  />
-                  {formatMemberName(member.nama_panggung)}
-                </label>
-              ))}
+            <div className="grid grid-cols-3 gap-1 border rounded-lg p-2 bg-gray-50">
+              {(() => {
+                const lineupOrder = ['cissi', 'acaa', 'channie', 'cally', 'sinta', 'piya']
+                return members
+                  .filter(m => m.member_id !== 'group')
+                  .sort((a, b) => {
+                    const iA = lineupOrder.indexOf(a.member_id)
+                    const iB = lineupOrder.indexOf(b.member_id)
+                    return (iA !== -1 ? iA : 99) - (iB !== -1 ? iB : 99)
+                  })
+                  .map((member) => (
+                  <label key={member.id} className="flex items-center gap-1 text-xs cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.lineup?.includes(member.id) || false}
+                      onChange={() => toggleMemberInLineup(member.id)}
+                      className="w-3 h-3"
+                    />
+                    {formatMemberName(member.nama_panggung)}
+                  </label>
+                ))
+              })()}
             </div>
           </div>
 

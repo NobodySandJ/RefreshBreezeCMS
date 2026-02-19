@@ -49,9 +49,9 @@ const MediaPage = () => {
   ]
 
   const VIDEOS = [
-    { id: 1, title: 'Refresh Breeze Live Performance 1', youtubeId: '77iP-nJ4b8Q' },
-    { id: 2, title: 'Refresh Breeze Live Performance 2', youtubeId: 'p-y2U3iWHKk' },
-    { id: 3, title: 'Refresh Breeze Official Content', youtubeId: 'HOUIkQd6tK0' },
+    { id: 1, title: 'Refresh Breeze Live Performance 1', youtubeId: 'jfKfPfyJRdk' },
+    { id: 2, title: 'Refresh Breeze Live Performance 2', youtubeId: 'jfKfPfyJRdk' },
+    { id: 3, title: 'Refresh Breeze Official Content', youtubeId: 'jfKfPfyJRdk' },
   ]
 
   return (

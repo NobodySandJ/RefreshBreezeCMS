@@ -9,19 +9,6 @@ import Skeleton from '../components/Skeleton'
 
 // Hardcoded member data from JSON
 const memberData = {
-  'yanyee': {
-    color: '#F97316',
-    gradient: 'from-orange-400 to-amber-500',
-    emoji: '🍪',
-    namaPanggung: '🍪 YanYee 🍪',
-    tagline: 'Anggun, Hangat, Cerah',
-    jiko: '"manis, lembut, dan selalu siap membuat harimu jadi lebih hangat seperti cookies yang baru matang🍪. haloo semuaa, aku yan yee!🪽"',
-    tanggalLahir: '22 November',
-    hobi: 'Makeup, dance, baking',
-    instagram: '@ho_yan.yee',
-    objectPosition: 'center 20%',
-    gallery: ['yanyee1.webp', 'yanyee2.webp', 'yanyee3.webp']
-  },
   'sinta': {
     color: '#10B981',
     gradient: 'from-green-400 to-emerald-500',
@@ -36,8 +23,8 @@ const memberData = {
     gallery: ['sinta1.webp', 'sinta2.webp', 'sinta3.webp']
   },
   'cissi': {
-    color: '#F472B6',
-    gradient: 'from-pink-400 to-rose-500',
+    color: '#FBBF24',
+    gradient: 'from-amber-400 to-yellow-500',
     emoji: '👑',
     namaPanggung: '👑 Cissi 👑',
     tagline: 'Imajinatif, Penari',
@@ -49,8 +36,8 @@ const memberData = {
     gallery: ['cissi1.webp', 'cissi2.webp', 'cissi3.webp']
   },
   'channie': {
-    color: '#34D399',
-    gradient: 'from-emerald-400 to-green-500',
+    color: '#6D28D9',
+    gradient: 'from-purple-600 to-indigo-600',
     emoji: '✨',
     namaPanggung: '✨ Channie ✨',
     tagline: 'Kreatif, Menghibur',
@@ -75,8 +62,8 @@ const memberData = {
     gallery: ['aca1.webp', 'aca2.webp', 'aca3.webp']
   },
   'cally': {
-    color: '#A78BFA',
-    gradient: 'from-violet-400 to-purple-500',
+    color: '#34D399',
+    gradient: 'from-emerald-400 to-green-500',
     emoji: '🪼',
     namaPanggung: '🪼 Cally 🪼',
     tagline: 'Lembut, Weirdo',
@@ -88,8 +75,8 @@ const memberData = {
     gallery: ['cally1.webp', 'cally2.webp', 'cally3.webp']
   },
   'piya': {
-    color: '#FBBF24',
-    gradient: 'from-amber-400 to-yellow-500',
+    color: '#F472B6',
+    gradient: 'from-pink-400 to-rose-500',
     emoji: '🐰',
     namaPanggung: '🐰 Piya 🐰',
     tagline: 'Periang, Lucu',
@@ -130,9 +117,9 @@ const MembersPage = () => {
       try {
         const response = await api.get('/members')
         if (response.data.success) {
-          const heroOrder = ['cally', 'yanyee', 'channie', 'acaa', 'cissi', 'sinta', 'piya']
+          const heroOrder = ['cissi', 'acaa', 'channie', 'cally', 'sinta', 'piya']
           const sorted = response.data.data
-            .filter(m => m.member_id !== 'group')
+            .filter(m => m.member_id !== 'group' && m.member_id !== 'yanyee')
             .sort((a, b) => {
               const indexA = heroOrder.indexOf(a.member_id)
               const indexB = heroOrder.indexOf(b.member_id)
@@ -214,16 +201,16 @@ const MembersPage = () => {
                       transition={{ delay: 0.4 }}
                       className="text-gray-300 max-w-md text-sm md:text-base"
                     >
-                      7 individu berbakat yang siap menghibur dan menginspirasi dengan energi positif mereka!
+                      6 individu berbakat yang siap menghibur dan menginspirasi dengan energi positif mereka!
                     </motion.p>
                   </div>
                 </div>
               </motion.div>
 
               {/* Members Grid - Card Layout */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 md:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-5 md:gap-6">
                 {loading ? (
-                  [...Array(7)].map((_, i) => (
+                  [...Array(6)].map((_, i) => (
                     <div key={i} className="aspect-[3/4] rounded-3xl bg-white/50 backdrop-blur-sm border border-white/50 overflow-hidden">
                       <Skeleton className="w-full h-full" />
                     </div>
