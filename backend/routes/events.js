@@ -88,7 +88,7 @@ router.get('/:id', async (req, res) => {
 // POST: Create new event (admin only)
 router.post('/', authMiddleware, async (req, res) => {
   try {
-    const { nama, tanggal, bulan, tahun, lokasi, event_time, cheki_time, is_past, is_special, theme_name, theme_color, lineup } = req.body
+    const { nama, tanggal, bulan, tahun, lokasi, event_time, cheki_time, is_past, type, theme_name, theme_color, lineup } = req.body
 
     // Insert event
     const { data: event, error: eventError } = await supabase
@@ -102,9 +102,10 @@ router.post('/', authMiddleware, async (req, res) => {
         event_time,
         cheki_time,
         is_past,
-        is_special: is_special || false,
-        theme_name: is_special ? theme_name : null,
-        theme_color: is_special ? theme_color : null
+        type: type || 'regular',
+        is_special: type === 'special',
+        theme_name: type === 'special' ? theme_name : null,
+        theme_color: type === 'special' ? theme_color : null
       })
       .select()
       .single()
@@ -137,6 +138,11 @@ router.patch('/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params
     const { lineup, ...updates } = req.body
+
+    // Sync is_special with type if type is updated
+    if (updates.type) {
+      updates.is_special = updates.type === 'special'
+    }
 
     // Update event basic info
     const { data: event, error: eventError } = await supabase

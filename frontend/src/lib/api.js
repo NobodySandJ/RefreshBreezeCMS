@@ -12,7 +12,7 @@ const api = axios.create({
 
 // Debug: Log API URL in production to help troubleshooting
 if (import.meta.env.MODE === 'production') {
-  console.log('🌐 API Base URL:', API_URL)
+  // console.log('🌐 API Base URL:', API_URL)
 }
 
 // Add auth token to requests and handle Content-Type

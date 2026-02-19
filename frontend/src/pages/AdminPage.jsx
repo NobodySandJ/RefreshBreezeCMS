@@ -94,7 +94,8 @@ const AdminPage = () => {
     const subscription = supabase
       .channel('public:orders')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, (payload) => {
-        console.log('🔔 Realtime update:', payload)
+        // Realtime update log removed
+
         fetchOrders()
         
         // Optional: Show toast notification
@@ -152,7 +153,7 @@ const AdminPage = () => {
       if (eventFilter !== 'all') params.event_id = eventFilter
       if (searchQuery) params.search = searchQuery
       
-      console.log('Fetch orders params:', params)
+
       
       if (dateFilter === 'week') {
         const weekAgo = new Date()
@@ -192,7 +193,7 @@ const AdminPage = () => {
   const fetchEvents = async () => {
     try {
       const response = await api.get('/events')
-      console.log('Events fetched:', response.data)
+
       setEvents(response.data.data || [])
     } catch (error) {
       console.error('Error fetching events:', error)
@@ -669,51 +670,73 @@ const AdminPage = () => {
   }
 
   const renderOrders = () => {
-    const otsOrders = orders.filter(o => o.is_ots)
-    const poOrders = orders.filter(o => !o.is_ots)
+    // Helper to check if order is from special event
+    const isSpecialOrder = (order) => {
+      const event = events.find(e => e.id === order.event_id)
+      return event && (event.is_special || event.type === 'special')
+    }
+
+    // Filter Logic:
+    // 1. Special Orders: All orders from special events
+    const specialOrders = orders.filter(o => isSpecialOrder(o))
+
+    // 2. OTS Orders: Regular events only
+    const otsOrders = orders.filter(o => o.is_ots && !isSpecialOrder(o))
+
+    // 3. PO Orders: Regular events only
+    const poOrders = orders.filter(o => !o.is_ots && !isSpecialOrder(o))
     
-
-
     return (
       <div className="space-y-6">
-        {/* Sub-tabs for OTS / PO */}
+        {/* Sub-tabs */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
-          <div className="flex border-b">
+          <div className="flex border-b overflow-x-auto">
             <button
               onClick={() => setOrderSubTab('all')}
-              className={`flex-1 px-6 py-4 font-semibold transition-colors ${
+              className={`flex-1 min-w-[120px] px-4 py-4 font-semibold transition-colors ${
                 orderSubTab === 'all'
                   ? 'bg-custom-green text-white border-b-4 border-green-700'
                   : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
               }`}
             >
               <span className="flex items-center justify-center gap-2">
-                <FaShoppingCart />
-                Semua Order
+                <FaShoppingCart /> All (Reg)
               </span>
             </button>
             <button
               onClick={() => setOrderSubTab('ots')}
-              className={`flex-1 px-6 py-4 font-semibold transition-colors ${
+              className={`flex-1 min-w-[120px] px-4 py-4 font-semibold transition-colors ${
                 orderSubTab === 'ots'
                   ? 'bg-orange-500 text-white border-b-4 border-orange-700'
                   : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
               }`}
             >
               <span className="flex items-center justify-center gap-2">
-                🏪 Order OTS
+                🏪 OTS
               </span>
             </button>
             <button
               onClick={() => setOrderSubTab('po')}
-              className={`flex-1 px-6 py-4 font-semibold transition-colors ${
+              className={`flex-1 min-w-[120px] px-4 py-4 font-semibold transition-colors ${
                 orderSubTab === 'po'
                   ? 'bg-blue-500 text-white border-b-4 border-blue-700'
                   : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
               }`}
             >
               <span className="flex items-center justify-center gap-2">
-                📦 Pre-Order
+                📦 PO
+              </span>
+            </button>
+            <button
+              onClick={() => setOrderSubTab('special')}
+              className={`flex-1 min-w-[120px] px-4 py-4 font-semibold transition-colors ${
+                orderSubTab === 'special'
+                  ? 'bg-pink-500 text-white border-b-4 border-pink-700'
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <span className="flex items-center justify-center gap-2">
+                ✨ Special
               </span>
             </button>
           </div>
@@ -725,15 +748,15 @@ const AdminPage = () => {
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-white border border-gray-300"></span>
-                <span><strong>Unchecked:</strong> Order baru (Belum dicek/verifikasi)</span>
+                <span><strong>Unchecked:</strong> Order baru</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-blue-100 border border-blue-400"></span>
-                <span><strong>Checked:</strong> Pembayaran valid (Lunas)</span>
+                <span><strong>Checked:</strong> Lunas (Valid)</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 rounded-full bg-green-100 border border-green-400"></span>
-                <span><strong>Completed:</strong> Selesai (Tiket diambil/Done)</span>
+                <span><strong>Completed:</strong> Selesai (Diambil)</span>
               </div>
             </div>
         </div>
@@ -875,6 +898,22 @@ const AdminPage = () => {
         </div>
   
         {/* Orders Tables */}
+        
+        {/* Special Orders Table */}
+         {orderSubTab === 'special' && (
+          <RenderTable 
+            data={specialOrders} 
+            title="Special Event Orders" 
+            icon={<span className="text-xl">✨</span>}
+            emptyMessage="Tidak ada order special event"
+            loading={loading}
+            onView={viewOrderDetail}
+            onDelete={handleDeleteOrder}
+            onStatusChange={handleStatusChange}
+          />
+        )}
+
+        {/* Regular OTS Tables */}
         {(orderSubTab === 'all' || orderSubTab === 'ots') && (
           <RenderTable 
             data={otsOrders} 
@@ -896,6 +935,7 @@ const AdminPage = () => {
           />
         )}
   
+        {/* Regular PO Tables */}
         {(orderSubTab === 'all' || orderSubTab === 'po') && (
           <RenderTable 
             data={poOrders} 
@@ -2100,7 +2140,8 @@ const OTSOrderModal = ({ members, events, onClose, onSuccess }) => {
 
 // Event Modal Component - Tabbed Version
 const EventModal = ({ members, onClose, onSuccess, editingEvent }) => {
-  const [eventType, setEventType] = useState(editingEvent?.is_special ? 'special' : 'regular')
+  const isEditingSpecial = editingEvent?.is_special || editingEvent?.type === 'special' || !!editingEvent?.theme_name || !!editingEvent?.theme_color
+  const [eventType, setEventType] = useState(isEditingSpecial ? 'special' : 'regular')
   const [formData, setFormData] = useState(() => {
     if (editingEvent) {
       const existingLineup = editingEvent.event_lineup?.map(el => el.member_id) || []
@@ -2144,7 +2185,7 @@ const EventModal = ({ members, onClose, onSuccess, editingEvent }) => {
 
     try {
       if (editingEvent) {
-        const payload = { ...formData }
+        const payload = { ...formData, type: eventType, is_special: eventType === 'special' }
         delete payload.event_gallery
         delete payload.event_lineup
         delete payload.created_at
@@ -2153,7 +2194,7 @@ const EventModal = ({ members, onClose, onSuccess, editingEvent }) => {
         await api.patch(`/events/${editingEvent.id}`, payload)
         Swal.fire({ icon: 'success', title: 'Event Updated!', timer: 1500, showConfirmButton: false })
       } else {
-        await api.post('/events', formData)
+        await api.post('/events', { ...formData, type: eventType, is_special: eventType === 'special' })
         Swal.fire({ icon: 'success', title: 'Event Created!', timer: 1500, showConfirmButton: false })
       }
       onSuccess()

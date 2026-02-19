@@ -36,6 +36,7 @@ const ShopPage = () => {
   const [orderSuccess, setOrderSuccess] = useState(null)
   const [receiptData, setReceiptData] = useState(null)
   const [eventDropdownOpen, setEventDropdownOpen] = useState(false)
+  const [lineupError, setLineupError] = useState(null)
   const fileInputRef = useRef(null)
   const [mobileCartOpen, setMobileCartOpen] = useState(false)
 
@@ -271,6 +272,28 @@ const ShopPage = () => {
     if (!file) return alert('Silakan unggah bukti transfer')
     if (!formData.event_id) return alert('Silakan pilih jadwal event')
 
+    // Validation: Check if cart items are allowed in the selected event (Lineup Check)
+    const selectedEvent = events.find(e => e.id === formData.event_id)
+    // Lineup validation only for SPECIAL events
+    const isEventSpecial = selectedEvent?.is_special || selectedEvent?.type === 'special' || !!selectedEvent?.theme_name || !!selectedEvent?.theme_color
+    if (selectedEvent && isEventSpecial && selectedEvent.event_lineup && selectedEvent.event_lineup.length > 0) {
+     const allowedMemberIds = selectedEvent.event_lineup.map(l => l.member_id)
+     const invalidItems = cart.filter(item => {
+        if (item.member_id === 'group') return false
+        return !allowedMemberIds.some(id => String(id) === String(item.member_id))
+     })
+
+     if (invalidItems.length > 0) {
+        setLineupError({
+           eventName: selectedEvent.nama,
+           eventColor: selectedEvent.theme_color || '#FF6B9D',
+           themeName: selectedEvent.theme_name || 'Special',
+           items: invalidItems
+        })
+        return
+     }
+  }
+
     setSubmitting(true)
     setUploading(true)
     
@@ -323,6 +346,11 @@ const ShopPage = () => {
       setUploading(false)
     }
   }
+
+  // Derived Theme Color for UI
+  const selectedEventForTheme = events.find(e => e.id === formData.event_id)
+  const isSpecialEvent = selectedEventForTheme?.is_special || selectedEventForTheme?.type === 'special' || !!selectedEventForTheme?.theme_name || !!selectedEventForTheme?.theme_color
+  const themeColor = isSpecialEvent ? (selectedEventForTheme.theme_color || '#FF6B9D') : '#079108'
 
   if (loading) return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-emerald-50/30 flex items-center justify-center">
@@ -760,47 +788,52 @@ const ShopPage = () => {
                     )}
                  </div>
 
-                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 pt-10 border-t-2 border-dashed border-gray-100 relative">
+                 {/* Form Section with Dynamic Theme */}
+                 <form 
+                    onSubmit={handleSubmit} 
+                    className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 pt-10 border-t-2 border-dashed border-gray-100 relative"
+                    style={{ '--theme-color': themeColor }}
+                 >
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white px-6">
                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300">Form Pemesanan</span>
                     </div>
+
                     <div className="space-y-6">
                         {/* Nama */}
                         <div className="space-y-2">
-                           <label className="text-[10px] font-black uppercase tracking-widest text-[#079108] ml-2">Nama</label>
+                           <label className="text-[10px] font-black uppercase tracking-widest text-[var(--theme-color)] ml-2">Nama</label>
                            <input 
-                              required
-                              value={formData.nama_panggilan}
-                              onChange={e => setFormData({...formData, nama_panggilan: e.target.value})}
-                              className="w-full bg-gray-50/80 border-2 border-gray-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 font-bold text-sm sm:text-base focus:outline-none focus:border-[#079108] focus:bg-white transition-all"
-                              placeholder="Nama kamu"
-                           />
+                               required
+                               value={formData.nama_panggilan}
+                               onChange={e => setFormData({...formData, nama_panggilan: e.target.value})}
+                               className="w-full bg-gray-50/80 border-2 border-gray-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 font-bold text-sm sm:text-base focus:outline-none focus:border-[var(--theme-color)] focus:bg-white transition-all"
+                               placeholder="Nama kamu"
+                            />
                         </div>
                         
-                        {/* Kontak - Simple Input */}
+                        {/* Kontak */}
                         <div className="space-y-2">
-                           <label className="text-[10px] font-black uppercase tracking-widest text-[#079108] ml-2">Kontak (IG / WA)</label>
+                           <label className="text-[10px] font-black uppercase tracking-widest text-[var(--theme-color)] ml-2">Kontak (IG / WA)</label>
                            <input 
-                              required
-                              value={formData.kontak}
-                              onChange={e => setFormData({...formData, kontak: e.target.value})}
-                              className="w-full bg-gray-50/80 border-2 border-gray-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 font-bold text-sm sm:text-base focus:outline-none focus:border-[#079108] focus:bg-white transition-all"
-                              placeholder="@username atau 08xxx"
-                           />
+                               required
+                               value={formData.kontak}
+                               onChange={e => setFormData({...formData, kontak: e.target.value})}
+                               className="w-full bg-gray-50/80 border-2 border-gray-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 font-bold text-sm sm:text-base focus:outline-none focus:border-[var(--theme-color)] focus:bg-white transition-all"
+                               placeholder="@username atau 08xxx"
+                            />
                         </div>
                         
-                        {/* Pilih Event - Custom Dropdown */}
+                        {/* Pilih Event */}
                         <div className="space-y-2">
-                           <label className="text-[10px] font-black uppercase tracking-widest text-[#079108] ml-2">Pilih Event</label>
+                           <label className="text-[10px] font-black uppercase tracking-widest text-[var(--theme-color)] ml-2">Pilih Event</label>
                            <div className="relative">
-                              {/* Dropdown Trigger */}
                               <div 
                                  onClick={() => setEventDropdownOpen(!eventDropdownOpen)}
-                                 className={`w-full bg-gray-50/80 border-2 rounded-xl sm:rounded-2xl p-3 sm:p-4 pr-12 font-bold text-sm sm:text-base cursor-pointer transition-all flex items-center justify-between ${eventDropdownOpen ? 'border-[#079108] bg-white' : 'border-gray-100 hover:border-gray-200'}`}
+                                 className={`w-full bg-gray-50/80 border-2 rounded-xl sm:rounded-2xl p-3 sm:p-4 pr-12 font-bold text-sm sm:text-base cursor-pointer transition-all flex items-center justify-between ${eventDropdownOpen ? 'border-[var(--theme-color)] bg-white' : 'border-gray-100 hover:border-gray-200'}`}
                               >
                                  {formData.event_id && events.find(e => e.id === formData.event_id) ? (
                                     <div className="flex items-center gap-2 flex-wrap">
-                                       <span className="text-[#079108]">📅</span>
+                                       <span className="text-[var(--theme-color)]">📅</span>
                                        <span>{events.find(e => e.id === formData.event_id)?.nama}</span>
                                        {events.find(e => e.id === formData.event_id)?.is_special && (
                                           <span 
@@ -816,12 +849,11 @@ const ShopPage = () => {
                                  ) : (
                                     <span className="text-gray-400">— Pilih Jadwal Event —</span>
                                  )}
-                                 <svg className={`w-5 h-5 text-[#079108] transition-transform ${eventDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <svg className={`w-5 h-5 text-[var(--theme-color)] transition-transform ${eventDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                  </svg>
                               </div>
                               
-                              {/* Dropdown Panel */}
                               <AnimatePresence>
                                  {eventDropdownOpen && (
                                     <motion.div
@@ -847,12 +879,13 @@ const ShopPage = () => {
                                                       }
                                                    }}
                                                    className={`p-4 transition-all border-b border-gray-50 last:border-b-0 ${
-                                                      formData.event_id === ev.id ? 'bg-[#079108]/10' : isPast ? 'bg-gray-50 opacity-60 cursor-not-allowed' : 'hover:bg-gray-50 cursor-pointer'
+                                                     formData.event_id === ev.id ? 'bg-gray-100' : isPast ? 'bg-gray-50 opacity-60 cursor-not-allowed' : 'hover:bg-gray-50 cursor-pointer'
                                                    }`}
+                                                   style={formData.event_id === ev.id ? { backgroundColor: `${ev.theme_color || '#079108'}10` } : {}}
                                                 >
                                                    <div className="flex items-center gap-3">
-                                                      <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
-                                                         formData.event_id === ev.id ? 'border-[#079108] bg-[#079108]' : 'border-gray-300'
+                                                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
+                                                         formData.event_id === ev.id ? 'border-[var(--theme-color)] bg-[var(--theme-color)]' : 'border-gray-300'
                                                       }`}>
                                                          {formData.event_id === ev.id && <div className="w-2 h-2 rounded-full bg-white"></div>}
                                                       </div>
@@ -887,22 +920,22 @@ const ShopPage = () => {
                               </AnimatePresence>
                            </div>
                         </div>
-                        </div>
 
-                        {/* Catatan (Optional) */}
+                        {/* Catatan */}
                         <div className="space-y-2">
                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Catatan <span className="normal-case font-semibold tracking-normal">(opsional)</span></label>
                            <textarea 
                               value={formData.catatan}
                               onChange={e => setFormData({...formData, catatan: e.target.value})}
-                              className="w-full bg-gray-50/80 border-2 border-gray-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 font-bold text-sm sm:text-base focus:outline-none focus:border-[#079108] focus:bg-white transition-all resize-none"
+                              className="w-full bg-gray-50/80 border-2 border-gray-100 rounded-xl sm:rounded-2xl p-3 sm:p-4 font-bold text-sm sm:text-base focus:outline-none focus:border-[var(--theme-color)] focus:bg-white transition-all resize-none"
                               placeholder="Contoh: saya tidak bisa hadir, tolong dikirim ya / ambil di event (COD)"
                               rows={3}
                            />
                            <p className="text-[10px] text-gray-400 ml-2 italic">NB: Catatan bersifat opsional. Bisa diisi jika kamu tidak bisa hadir di event, ingin cheki dikirim, atau ambil langsung (COD) di lokasi.</p>
                         </div>
-
-                     <div className="space-y-6">
+                    </div>
+                     
+                    <div className="space-y-6">
                         {/* Payment Information Card */}
                         <div className="space-y-2">
                            <label className="text-[10px] font-black uppercase tracking-widest text-blue-500 ml-2">Pembayaran via BCA</label>
@@ -964,12 +997,12 @@ const ShopPage = () => {
                            </motion.div>
                         </div>
 
-                        {/* Upload Area with Preview */}
+                        {/* Upload */}
                        <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-[#079108] ml-2">Bukti Transfer</label>
+                          <label className="text-[10px] font-black uppercase tracking-widest text-[var(--theme-color)] ml-2">Bukti Transfer</label>
                           <div 
                              onClick={() => fileInputRef.current.click()}
-                             className={`relative border-2 border-dashed rounded-2xl overflow-hidden cursor-pointer transition-all ${file ? 'border-[#079108] bg-[#079108]/5' : 'border-gray-200 hover:border-[#079108]/50 hover:bg-gray-50'}`}
+                             className={`relative border-2 border-dashed rounded-2xl overflow-hidden cursor-pointer transition-all ${file ? 'border-[var(--theme-color)] bg-gray-50' : 'border-gray-200 hover:bg-gray-50'}`}
                              style={{ minHeight: '180px' }}
                           >
                              <input type="file" ref={fileInputRef} hidden onChange={handleFileChange} accept="image/*" />
@@ -979,7 +1012,7 @@ const ShopPage = () => {
                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                                       <p className="text-white text-xs font-bold">Klik untuk ganti</p>
                                    </div>
-                                   <div className="absolute top-2 right-2 bg-[#079108] text-white px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                                    <div className="absolute top-2 right-2 bg-[var(--theme-color)] text-white px-2 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1">
                                       <FaCheckCircle /> Uploaded
                                    </div>
                                 </div>
@@ -1007,8 +1040,8 @@ const ShopPage = () => {
                           <motion.button 
                              whileHover={{ scale: submitting ? 1 : 1.02 }}
                              whileTap={{ scale: submitting ? 1 : 0.98 }}
-                             disabled={submitting}
-                             className="w-full bg-gradient-to-r from-[#4A90B5] to-[#3B7A9E] text-white py-3.5 sm:py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:from-[#3B7A9E] hover:to-[#2B5D7A] transition-all disabled:opacity-70 flex items-center justify-center gap-3"
+                             className="w-full bg-[var(--theme-color)] text-white py-3.5 sm:py-4 rounded-xl font-black uppercase text-xs tracking-widest transition-all disabled:opacity-70 flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                             style={{ background: isSpecialEvent ? 'var(--theme-color)' : 'linear-gradient(to right, #4A90B5, #3B7A9E)' }}
                           >
                              {submitting ? (
                                <>
@@ -1021,7 +1054,8 @@ const ShopPage = () => {
                           </motion.button>
                        </div>
                     </div>
-                 </form>
+                  </form>
+
               </div>
            </motion.div>
         )}
@@ -1093,6 +1127,58 @@ const ShopPage = () => {
            </motion.div>
         )}
       </main>
+
+      {/* LINEUP ERROR MODAL - Centered */}
+      {lineupError && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setLineupError(null)}>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-3xl shadow-2xl border border-gray-100 p-6 sm:p-8 max-w-sm w-[90vw] mx-auto space-y-4"
+          >
+            {/* Header */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${lineupError.eventColor}15` }}>
+                <span className="text-lg">⚠️</span>
+              </div>
+              <div>
+                <p className="font-black text-sm uppercase tracking-wider text-gray-900">Member Tidak Tersedia</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest mt-0.5" style={{ color: lineupError.eventColor }}>Special Event</p>
+              </div>
+            </div>
+
+            {/* Description */}
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Event <strong className="text-gray-800">{lineupError.eventName}</strong> hanya tersedia untuk lineup tertentu. Hapus item berikut dari keranjang untuk melanjutkan.
+            </p>
+
+            {/* Invalid Items List */}
+            <div className="space-y-2 pt-3 border-t border-gray-100">
+              <p className="font-black uppercase text-[9px] tracking-[0.2em] text-gray-400">Item yang harus dihapus</p>
+              {lineupError.items.map((item, idx) => (
+                <div key={idx} className="flex items-center gap-2.5 py-2 px-3 rounded-xl bg-gray-50">
+                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: lineupError.eventColor }}></span>
+                  <span className="font-bold text-sm text-gray-700">{item.name}</span>
+                  <span className="text-gray-400 ml-auto text-xs font-mono">×{item.quantity}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Close Button */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setLineupError(null)}
+              className="w-full py-3 rounded-xl font-black text-xs uppercase tracking-widest text-white transition-all"
+              style={{ backgroundColor: lineupError.eventColor }}
+            >
+              Mengerti
+            </motion.button>
+          </motion.div>
+        </div>
+      )}
     </div>
   )
 }
