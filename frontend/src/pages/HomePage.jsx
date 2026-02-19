@@ -25,8 +25,8 @@ const HomePage = () => {
   const initialMembers = [
     { id: 'cissi', name: 'CISSI', color: 'bg-[#5A8F5A]', photo: getAssetPath('/images/hero/cissi.webp?v=32'), posX: 26, posY: 25, scale: 2.1, translateX: -27, translateY: 5 },
     { id: 'channie', name: 'CHANNIE', color: 'bg-[#6A9F6A]', photo: getAssetPath('/images/hero/channie.webp?v=32'), posX: 39, posY: 30, scale: 2.1, translateX: -8, translateY: 8 },
-    { id: 'aca', name: 'ACA', color: 'bg-[#4A90B5]', photo: getAssetPath('/images/hero/aca.webp?v=32'), posX: 0, posY: 23, scale: 2.1, translateX: 18, translateY: 0 },
     { id: 'sinta', name: 'SINTA', color: 'bg-[#4C804C]', photo: getAssetPath('/images/hero/sinta.webp?v=32'), posX: 48, posY: 31, scale: 2, translateX: 18, translateY: 6 },
+    { id: 'aca', name: 'ACA', color: 'bg-[#4A90B5]', photo: getAssetPath('/images/hero/aca.webp?v=32'), posX: 0, posY: 23, scale: 2.1, translateX: 18, translateY: 0 },
     { id: 'piya', name: 'PIYA', color: 'bg-[#3E723E]', photo: getAssetPath('/images/hero/piya.webp?v=32'), posX: 50, posY: 30, scale: 2.1, translateX: 5, translateY: 9 },
     { id: 'cally', name: 'CALLY', color: 'bg-[#9BBF9B]', photo: getAssetPath('/images/hero/cally.webp?v=32'), posX: 27, posY: 28, scale: 1.8, translateX: 18, translateY: 0 },
   ]
