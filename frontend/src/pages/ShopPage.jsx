@@ -930,28 +930,54 @@ const ShopPage = () => {
           </div>
 
           {/* Mobile Cart Bottom Bar */}
-          {cart.length > 0 && (
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-200 p-4 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <FaShoppingCart className="text-xl text-[#079108]" />
-                    <span className="absolute -top-2 -right-2 bg-[#079108] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                      {cart.reduce((sum, item) => sum + item.quantity, 0)}
-                    </span>
+          {(cart.length > 0 || merchCart.length > 0) && (
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-gray-200 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+              {/* Event Cart Row */}
+              {cart.length > 0 && (
+                <div className="flex items-center justify-between gap-4 px-4 py-3 border-b border-gray-100">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <FaShoppingCart className="text-xl text-[#079108]" />
+                      <span className="absolute -top-2 -right-2 bg-[#079108] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                        {cart.reduce((sum, item) => sum + item.quantity, 0)}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Tiket</p>
+                      <p className="text-base font-black text-gray-900">IDR {totalHarga.toLocaleString()}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-xs text-gray-500 font-bold">Total</p>
-                    <p className="text-lg font-black text-gray-900">IDR {totalHarga.toLocaleString()}</p>
-                  </div>
+                  <button
+                    onClick={() => setStep(2)}
+                    className="flex-1 max-w-[160px] bg-gradient-to-r from-[#079108] to-emerald-500 text-white py-3 px-5 rounded-xl font-black text-xs uppercase tracking-wider shadow-lg shadow-[#079108]/30"
+                  >
+                    Checkout
+                  </button>
                 </div>
-                <button 
-                  onClick={() => setStep(2)}
-                  className="flex-1 max-w-[180px] bg-gradient-to-r from-[#079108] to-emerald-500 text-white py-3.5 px-6 rounded-xl font-black text-xs uppercase tracking-wider shadow-lg shadow-[#079108]/30"
-                >
-                  Checkout
-                </button>
-              </div>
+              )}
+              {/* Merch Cart Row */}
+              {merchCart.length > 0 && (
+                <div className="flex items-center justify-between gap-4 px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <FaBox className="text-xl text-[#079108]" />
+                      <span className="absolute -top-2 -right-2 bg-[#079108] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                        {merchCart.reduce((sum, item) => sum + item.quantity, 0)}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Merch</p>
+                      <p className="text-base font-black text-gray-900">IDR {totalMerchHarga.toLocaleString()}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setStep(4)}
+                    className="flex-1 max-w-[160px] bg-gradient-to-r from-[#079108] to-emerald-500 text-white py-3 px-5 rounded-xl font-black text-xs uppercase tracking-wider shadow-lg shadow-[#079108]/30"
+                  >
+                    Checkout Merch
+                  </button>
+                </div>
+              )}
             </div>
           )}
           </>
