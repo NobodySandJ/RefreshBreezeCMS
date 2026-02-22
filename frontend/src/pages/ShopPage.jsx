@@ -1358,21 +1358,13 @@ const ShopPage = () => {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
-                className="mb-8 w-full max-w-sm mx-auto bg-gradient-to-br from-pink-50 via-rose-50 to-fuchsia-50 border border-pink-200/60 rounded-2xl p-5 text-center shadow-lg"
+                className="mb-8 text-center"
               >
-                <p className="text-base mb-1">📸</p>
-                <p className="text-sm font-black text-gray-800 mb-1">Bagikan ke Instagram Stories kamu!</p>
-                <p className="text-[11px] text-gray-500 leading-relaxed mb-3">
-                  Download notamu, jadikan IGS, dan tag <span className="font-black text-pink-500">@refreshbreeze</span> — tunjukkan dukunganmu untuk oshi-mu &amp; bantu Refresh Breeze makin dikenal dunia! 💚
+                <p className="text-[11px] text-gray-400 mb-2">
+                  Bagikan notamu ke IGS dan tag{' '}
+                  <a href="https://www.instagram.com/refreshbreeze" target="_blank" rel="noopener noreferrer" className="font-black text-pink-400 hover:text-pink-500 transition-colors">@refreshbreeze</a>
+                  {' '}— bantu Refresh Breeze makin dikenal! 💚
                 </p>
-                <a
-                  href="https://www.instagram.com/refreshbreeze"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-pink-500 via-rose-500 to-fuchsia-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:shadow-lg hover:shadow-pink-300/50 transition-all"
-                >
-                  Kunjungi @refreshbreeze
-                </a>
               </motion.div>
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -1666,21 +1658,13 @@ const ShopPage = () => {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="mb-8 w-full max-w-sm mx-auto bg-gradient-to-br from-pink-50 via-rose-50 to-fuchsia-50 border border-pink-200/60 rounded-2xl p-5 text-center shadow-lg"
+              className="mb-8 text-center"
             >
-              <p className="text-base mb-1">📸</p>
-              <p className="text-sm font-black text-gray-800 mb-1">Bagikan ke Instagram Stories kamu!</p>
-              <p className="text-[11px] text-gray-500 leading-relaxed mb-3">
-                Download notamu, jadikan IGS, dan tag <span className="font-black text-pink-500">@refreshbreeze</span> — tunjukkan dukunganmu untuk oshi-mu &amp; bantu Refresh Breeze makin dikenal dunia! 💚
+              <p className="text-[11px] text-gray-400 mb-2">
+                Bagikan notamu ke IGS dan tag{' '}
+                <a href="https://www.instagram.com/refreshbreeze" target="_blank" rel="noopener noreferrer" className="font-black text-pink-400 hover:text-pink-500 transition-colors">@refreshbreeze</a>
+                {' '}— bantu Refresh Breeze makin dikenal! 💚
               </p>
-              <a
-                href="https://www.instagram.com/refreshbreeze"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-pink-500 via-rose-500 to-fuchsia-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:shadow-lg hover:shadow-pink-300/50 transition-all"
-              >
-                Kunjungi @refreshbreeze
-              </a>
             </motion.div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
