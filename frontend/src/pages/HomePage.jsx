@@ -518,15 +518,6 @@ const HomePage = () => {
                  </div>
              </div>
 
-             <div className="text-center mt-12">
-                 <button 
-                    onClick={() => navigate('/shop')}
-                    className="px-10 py-4 bg-[#079108] text-white rounded-full font-black text-xs uppercase tracking-widest hover:bg-[#068007] transition-all shadow-xl shadow-[#079108]/20 hover:scale-105"
-                 >
-                    Visit Store
-                 </button>
-             </div>
-
              {/* Merch Products Grid */}
              {merchPreview.length > 0 && (
              <div className="mt-16 sm:mt-20">
@@ -551,13 +542,11 @@ const HomePage = () => {
                      onClick={() => navigate('/shop')}
                      className="group bg-white rounded-[1.5rem] shadow-lg hover:shadow-2xl hover:shadow-emerald-200/50 transition-all duration-300 cursor-pointer overflow-hidden border border-gray-100"
                    >
-                     <div className="aspect-square bg-gradient-to-br from-emerald-50 to-gray-100 overflow-hidden flex items-center justify-center p-2">
-                       {item.gambar_url ? (
-                         <img src={item.gambar_url} alt={item.nama} className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-700" loading="lazy" />
-                       ) : (
-                         <div className="w-full h-full flex items-center justify-center text-5xl text-emerald-200">📦</div>
-                       )}
-                     </div>
+                     {item.gambar_url && (
+                       <div className="w-full bg-gradient-to-br from-emerald-50 to-gray-100 overflow-hidden">
+                         <img src={item.gambar_url} alt={item.nama} className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-700" loading="lazy" />
+                       </div>
+                     )}
                      <div className="p-4">
                        <h4 className="font-black text-sm uppercase tracking-tight text-gray-900 leading-tight truncate">{item.nama}</h4>
                        {item.deskripsi && <p className="text-[10px] text-gray-500 mt-0.5 line-clamp-1">{item.deskripsi}</p>}
@@ -572,7 +561,7 @@ const HomePage = () => {
                    onClick={() => navigate('/shop')}
                    className="px-10 py-4 bg-[#079108] text-white rounded-full font-black text-xs uppercase tracking-widest hover:bg-[#068007] transition-all shadow-xl shadow-[#079108]/20 hover:scale-105"
                  >
-                   Lihat Semua Merch
+                   Visit Store
                  </button>
                </div>
              </div>

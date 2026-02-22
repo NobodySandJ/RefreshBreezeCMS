@@ -217,7 +217,7 @@ const ShopPage = () => {
       toast(
         <div className="flex items-center gap-4 px-6 py-3 bg-red-900/90 backdrop-blur-xl rounded-full border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] min-w-[280px]">
           <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-xl shadow-inner border border-white/5">
-            —‘¸
+            🗑️
           </div>
           <div className="flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400 leading-none mb-1.5">Removed from Cart</p>
@@ -256,7 +256,7 @@ const ShopPage = () => {
       toast(
         <div className="flex items-center gap-4 px-6 py-3 bg-red-900/90 backdrop-blur-xl rounded-full border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] min-w-[280px]">
           <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-xl shadow-inner border border-white/5">
-            —‘¸
+            🗑️
           </div>
           <div className="flex flex-col">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-400 leading-none mb-1.5">Removed from Cart</p>
@@ -277,7 +277,7 @@ const ShopPage = () => {
 
   const totalHarga = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
 
-  // ”€”€ Merch Cart Logic ”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€”€
+  // ”—€ Merch Cart Logic ”—————————————————————————————————————€
   const addToMerchCart = (item) => {
     const existing = merchCart.find(i => i.id === item.id)
     const newQty = existing ? existing.quantity + 1 : 1
@@ -649,7 +649,7 @@ const ShopPage = () => {
                    </div>
                 </div>
 
-                {/* ”€”€”€”€ OFFICIAL MERCH SECTION ”€”€”€”€ */}
+                {/* ”———€ OFFICIAL MERCH SECTION ”———€ */}
                 {merch.length > 0 && (
                 <div className="space-y-8">
                   <div className="flex items-center gap-4">
@@ -675,7 +675,7 @@ const ShopPage = () => {
                           whileHover={!habis ? { y: -6, scale: 1.02 } : {}}
                           className={`group relative bg-white rounded-3xl overflow-hidden shadow-lg transition-all duration-300 border border-gray-100 ${habis ? 'opacity-60' : 'hover:shadow-2xl hover:shadow-emerald-200/40'}`}
                         >
-                          {/* Image €” click opens modal */}
+                          {/* Image — click opens modal */}
                           <div
                             className="relative aspect-square overflow-hidden cursor-zoom-in"
                             onClick={() => setSelectedMerch(item)}
@@ -721,10 +721,10 @@ const ShopPage = () => {
                               )}
                             </div>
                             {(!item.stok || item.stok === 0) && (
-                              <p className="text-[10px] text-emerald-600 font-bold">“¦ Pre-Order</p>
+                              <p className="text-[10px] text-emerald-600 font-bold">⏳ Pre-Order</p>
                             )}
                             {item.stok > 0 && item.stok <= 10 && !habis && (
-                              <p className="text-[10px] text-orange-500 font-bold">š ¸ Sisa {item.stok} item</p>
+                              <p className="text-[10px] text-orange-500 font-bold">⚠️ Sisa {item.stok} item</p>
                             )}
                           </div>
                         </motion.div>
@@ -1101,11 +1101,11 @@ const ShopPage = () => {
                                              {events.find(e => e.id === formData.event_id)?.theme_name || 'Special'}
                                           </span>
                                        )}
-                                       <span className="text-gray-400">€¢</span>
+                                       <span className="text-gray-400">•</span>
                                        <span className="text-gray-500">{events.find(e => e.id === formData.event_id)?.tanggal} {events.find(e => e.id === formData.event_id)?.bulan}</span>
                                     </div>
                                  ) : (
-                                    <span className="text-gray-400">€” Pilih Jadwal Event €”</span>
+                                    <span className="text-gray-400">— Pilih Jadwal Event —</span>
                                  )}
                                   <svg className={`w-5 h-5 text-[var(--theme-color)] transition-transform ${eventDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -1165,7 +1165,7 @@ const ShopPage = () => {
                                                             )}
                                                          </div>
                                                          <p className="text-xs text-gray-500">
-                                                            {ev.tanggal} {ev.bulan} {ev.tahun} €¢ “ {ev.lokasi}
+                                                            {ev.tanggal} {ev.bulan} {ev.tahun} • 📍 {ev.lokasi}
                                                          </p>
                                                       </div>
                                                    </div>
@@ -1522,7 +1522,7 @@ const ShopPage = () => {
                       rows={4}
                     />
                     <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex items-start gap-2">
-                      <span className="text-orange-500 text-sm mt-0.5">š ¸</span>
+                      <span className="text-orange-500 text-sm mt-0.5">⚠️</span>
                       <p className="text-[10px] text-orange-700 font-semibold leading-relaxed">
                         <strong>Ongkos kirim ditanggung pembeli.</strong> Jika memilih pengiriman, pastikan alamat lengkap agar merch sampai tepat waktu. Untuk COD, ambil langsung di lokasi event.
                       </p>
@@ -1741,7 +1741,7 @@ const ShopPage = () => {
               className="bg-white rounded-3xl overflow-hidden shadow-2xl w-full max-w-2xl flex flex-col sm:flex-row"
               onClick={e => e.stopPropagation()}
             >
-              {/* LEFT €” Image */}
+              {/* LEFT — Image */}
               <div className="relative bg-gray-50 sm:w-[45%] flex-shrink-0 aspect-square sm:aspect-auto sm:min-h-[380px]">
                 {selectedMerch.gambar_url ? (
                   <img
@@ -1759,7 +1759,7 @@ const ShopPage = () => {
                 )}
               </div>
 
-              {/* RIGHT €” Info */}
+              {/* RIGHT — Info */}
               <div className="flex-1 flex flex-col p-6 gap-4 relative">
                 {/* Close */}
                 <button
@@ -1781,7 +1781,7 @@ const ShopPage = () => {
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="text-2xl font-black text-[#079108]">IDR {selectedMerch.harga.toLocaleString()}</span>
                   {selectedMerch.stok > 0 && selectedMerch.stok <= 10 && (
-                    <span className="text-xs text-orange-500 font-bold">š ¸ Sisa {selectedMerch.stok}</span>
+                    <span className="text-xs text-orange-500 font-bold">⚠️ Sisa {selectedMerch.stok}</span>
                   )}
                 </div>
 
@@ -1845,7 +1845,7 @@ const ShopPage = () => {
             {/* Header */}
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${lineupError.eventColor}15` }}>
-                <span className="text-lg">š ¸</span>
+                <span className="text-lg">⚠️</span>
               </div>
               <div>
                 <p className="font-black text-sm uppercase tracking-wider text-gray-900">Member Tidak Tersedia</p>
@@ -2123,7 +2123,7 @@ const MerchReceiptDrawer = ({ merchReceiptData }) => {
 
       // ONGKIR NOTE
       drawDashedLine()
-      drawText('š  Ongkos kirim ditanggung pembeli.', W / 2, 11, '#b45309', 'center', 'bold')
+      drawText('⚠️ Ongkos kirim ditanggung pembeli.', W / 2, 11, '#b45309', 'center', 'bold')
       y += lineH
       drawText('Admin konfirmasi ongkir via WA/IG.', W / 2, 11, '#b45309', 'center', 'normal')
       y += lineH
