@@ -809,7 +809,7 @@ const ShopPage = () => {
                         <motion.button 
                            whileHover={{ scale: cart.length > 0 ? 1.02 : 1 }}
                            whileTap={{ scale: cart.length > 0 ? 0.98 : 1 }}
-                           onClick={() => cart.length > 0 && setStep(2)}
+                           onClick={() => { if (cart.length > 0) { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) } }}
                            disabled={cart.length === 0}
                            className="w-full bg-gradient-to-r from-[#079108] to-emerald-500 text-white py-4 rounded-xl font-black uppercase text-xs tracking-widest hover:shadow-lg hover:shadow-[#079108]/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                         >
@@ -916,7 +916,7 @@ const ShopPage = () => {
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => setStep(4)}
+                        onClick={() => { setStep(4); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                         className="w-full bg-gradient-to-r from-[#079108] to-emerald-500 text-white py-3.5 rounded-xl font-black uppercase text-xs tracking-widest hover:shadow-lg hover:shadow-[#079108]/30 transition-all"
                       >
                         Checkout Merch
@@ -948,7 +948,7 @@ const ShopPage = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => setStep(2)}
+                    onClick={() => { setStep(2); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                     className="flex-1 max-w-[160px] bg-gradient-to-r from-[#079108] to-emerald-500 text-white py-3 px-5 rounded-xl font-black text-xs uppercase tracking-wider shadow-lg shadow-[#079108]/30"
                   >
                     Checkout
@@ -971,7 +971,7 @@ const ShopPage = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => setStep(4)}
+                    onClick={() => { setStep(4); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                     className="flex-1 max-w-[160px] bg-gradient-to-r from-[#079108] to-emerald-500 text-white py-3 px-5 rounded-xl font-black text-xs uppercase tracking-wider shadow-lg shadow-[#079108]/30"
                   >
                     Checkout Merch
@@ -1064,20 +1064,24 @@ const ShopPage = () => {
                     )}
                  </div>
 
+                 {/* Form Section Divider */}
+                 <div className="relative flex items-center py-6">
+                    <div className="flex-1 h-px bg-gray-100"></div>
+                    <span className="px-4 text-xs font-black uppercase tracking-widest text-gray-300 whitespace-nowrap">Form Pemesanan</span>
+                    <div className="flex-1 h-px bg-gray-100"></div>
+                 </div>
+
                  {/* Form Section with Dynamic Theme */}
                  <form 
                     onSubmit={handleSubmit} 
-                    className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10 pt-10 border-t-2 border-dashed border-gray-100 relative"
+                    className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 md:gap-10"
                     style={{ '--theme-color': themeColor }}
                  >
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white px-6">
-                       <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300">Form Pemesanan</span>
-                    </div>
 
                     <div className="space-y-6">
                         {/* Nama */}
                         <div className="space-y-2">
-                           <label className="text-[10px] font-black uppercase tracking-widest text-[var(--theme-color)] ml-2">Nama</label>
+                           <label className="text-xs font-bold text-[var(--theme-color)] ml-1">Nama</label>
                            <input 
                                required
                                value={formData.nama_panggilan}
@@ -1089,7 +1093,7 @@ const ShopPage = () => {
                         
                         {/* Kontak */}
                         <div className="space-y-2">
-                           <label className="text-[10px] font-black uppercase tracking-widest text-[var(--theme-color)] ml-2">Kontak (IG / WA)</label>
+                           <label className="text-xs font-bold text-[var(--theme-color)] ml-1">Kontak (IG / WA)</label>
                            <input 
                                required
                                value={formData.kontak}
@@ -1101,7 +1105,7 @@ const ShopPage = () => {
                         
                         {/* Pilih Event */}
                         <div className="space-y-2">
-                           <label className="text-[10px] font-black uppercase tracking-widest text-[var(--theme-color)] ml-2">Pilih Event</label>
+                           <label className="text-xs font-bold text-[var(--theme-color)] ml-1">Pilih Event</label>
                            <div className="relative">
                               <div 
                                  onClick={() => setEventDropdownOpen(!eventDropdownOpen)}
@@ -1198,7 +1202,7 @@ const ShopPage = () => {
 
                         {/* Catatan */}
                         <div className="space-y-2">
-                           <label className="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-2">Catatan <span className="normal-case font-semibold tracking-normal">(opsional)</span></label>
+                           <label className="text-xs font-bold text-gray-400 ml-1">Catatan <span className="font-semibold">(opsional)</span></label>
                            <textarea 
                               value={formData.catatan}
                               onChange={e => setFormData({...formData, catatan: e.target.value})}
@@ -1213,7 +1217,7 @@ const ShopPage = () => {
                     <div className="space-y-6">
                         {/* Payment Information Card */}
                         <div className="space-y-2">
-                           <label className="text-[10px] font-black uppercase tracking-widest text-blue-500 ml-2">Pembayaran via BCA</label>
+                           <label className="text-xs font-bold text-blue-500 ml-1">Pembayaran via BCA</label>
                            <motion.div 
                               initial={{ opacity: 0, scale: 0.95 }}
                               animate={{ opacity: 1, scale: 1 }}
@@ -1274,7 +1278,7 @@ const ShopPage = () => {
 
                         {/* Upload */}
                        <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-[var(--theme-color)] ml-2">Bukti Transfer</label>
+                          <label className="text-xs font-bold text-[var(--theme-color)] ml-1">Bukti Transfer</label>
                           <div 
                              onClick={() => fileInputRef.current.click()}
                              className={`relative border-2 border-dashed rounded-2xl overflow-hidden cursor-pointer transition-all ${file ? 'border-[var(--theme-color)] bg-gray-50' : 'border-gray-200 hover:bg-gray-50'}`}
@@ -1505,17 +1509,21 @@ const ShopPage = () => {
                 )}
               </div>
 
+              {/* Merch Form Section Divider */}
+              <div className="relative flex items-center py-6">
+                <div className="flex-1 h-px bg-gray-100"></div>
+                <span className="px-4 text-xs font-black uppercase tracking-widest text-gray-300 whitespace-nowrap">Form Pemesanan Merch</span>
+                <div className="flex-1 h-px bg-gray-100"></div>
+              </div>
+
               {/* Merch Order Form */}
-              <form onSubmit={handleMerchSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-10 border-t-2 border-dashed border-gray-100 relative">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white px-6">
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-300">Form Pemesanan Merch</span>
-                </div>
+              <form onSubmit={handleMerchSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
                 {/* LEFT: Form Fields */}
                 <div className="space-y-6">
                   {/* Nama Lengkap */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-[#079108] ml-2">Nama Lengkap</label>
+                    <label className="text-xs font-bold text-[#079108] ml-1">Nama Lengkap</label>
                     <input
                       required
                       value={merchForm.nama_lengkap}
@@ -1528,7 +1536,7 @@ const ShopPage = () => {
 
                   {/* No WA & Instagram (side by side) */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-[#079108] ml-2">Kontak</label>
+                    <label className="text-xs font-bold text-[#079108] ml-1">Kontak</label>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1">
                         <input
@@ -1555,7 +1563,7 @@ const ShopPage = () => {
 
                   {/* Catatan */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-[#079108] ml-2">Catatan Pengiriman</label>
+                    <label className="text-xs font-bold text-[#079108] ml-1">Catatan Pengiriman</label>
                     <textarea
                       value={merchForm.catatan}
                       onChange={e => setMerchForm({...merchForm, catatan: e.target.value})}
@@ -1576,7 +1584,7 @@ const ShopPage = () => {
                 <div className="space-y-6">
                   {/* BCA Payment Info */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-500 ml-2">Pembayaran via BCA</label>
+                    <label className="text-xs font-bold text-blue-500 ml-1">Pembayaran via BCA</label>
                     <motion.div
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
@@ -1619,7 +1627,7 @@ const ShopPage = () => {
 
                   {/* Upload Bukti Transfer */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-[#079108] ml-2">Bukti Transfer</label>
+                    <label className="text-xs font-bold text-[#079108] ml-1">Bukti Transfer</label>
                     <div
                       onClick={() => merchFileInputRef.current?.click()}
                       className={`relative border-2 border-dashed rounded-2xl overflow-hidden cursor-pointer transition-all ${merchFile ? 'border-[#079108] bg-gray-50' : 'border-gray-200 hover:bg-gray-50'}`}
@@ -1857,6 +1865,7 @@ const ShopPage = () => {
                       addToMerchCart(selectedMerch)
                       setSelectedMerch(null)
                       setStep(4)
+                      window.scrollTo({ top: 0, behavior: 'smooth' })
                     }}
                     className="w-full border-2 border-[#079108] text-[#079108] py-3 rounded-2xl font-black uppercase text-sm tracking-widest hover:bg-emerald-50 transition-colors flex items-center justify-center gap-2"
                   >
