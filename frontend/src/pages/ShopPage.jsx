@@ -672,25 +672,18 @@ const ShopPage = () => {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: idx * 0.08 }}
-                          whileHover={!habis ? { y: -6, scale: 1.02 } : {}}
-                          className={`group relative bg-white rounded-3xl overflow-hidden shadow-lg transition-all duration-300 border border-gray-100 ${habis ? 'opacity-60' : 'hover:shadow-2xl hover:shadow-emerald-200/40'}`}
+                          className={`relative bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100 cursor-pointer ${habis ? 'opacity-60' : ''}`}
+                          onClick={() => !habis && setSelectedMerch(item)}
                         >
-                          {/* Image — click opens modal */}
-                          <div
-                            className="relative aspect-square overflow-hidden cursor-zoom-in"
-                            onClick={() => setSelectedMerch(item)}
-                          >
+                          {/* Image — natural ratio */}
+                          <div className="relative w-full overflow-hidden">
                             {item.gambar_url ? (
-                              <img src={item.gambar_url} alt={item.nama} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                              <img src={item.gambar_url} alt={item.nama} className="w-full h-auto object-contain" />
                             ) : (
-                              <div className="w-full h-full bg-gradient-to-br from-emerald-50 to-gray-100 flex items-center justify-center">
+                              <div className="w-full aspect-square bg-gradient-to-br from-emerald-50 to-gray-100 flex items-center justify-center">
                                 <FaBox className="text-5xl text-emerald-200" />
                               </div>
                             )}
-                            {/* Zoom hint overlay */}
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center">
-                              <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/60 text-white text-[10px] font-bold px-3 py-1.5 rounded-full tracking-widest uppercase">” Lihat Detail</span>
-                            </div>
                             {habis && (
                               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                                 <span className="bg-red-500 text-white text-xs font-black uppercase px-4 py-2 rounded-full tracking-widest">Habis</span>
@@ -711,10 +704,9 @@ const ShopPage = () => {
                               <span className="text-base font-black text-[#079108]">IDR {item.harga.toLocaleString()}</span>
                               {!habis && (
                                 <motion.div
-                                  whileHover={{ scale: 1.15 }}
                                   whileTap={{ scale: 0.9 }}
                                   className="w-8 h-8 rounded-full bg-[#079108] flex items-center justify-center text-white shadow-md cursor-pointer"
-                                  onClick={() => addToMerchCart(item)}
+                                  onClick={e => { e.stopPropagation(); addToMerchCart(item) }}
                                 >
                                   <FaPlus className="text-xs" />
                                 </motion.div>
