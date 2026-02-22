@@ -1091,7 +1091,6 @@ const ShopPage = () => {
                               >
                                  {formData.event_id && events.find(e => e.id === formData.event_id) ? (
                                     <div className="flex items-center gap-2 flex-wrap">
-                                       <span className="text-[var(--theme-color)]">“…</span>
                                        <span>{events.find(e => e.id === formData.event_id)?.nama}</span>
                                        {events.find(e => e.id === formData.event_id)?.is_special && (
                                           <span 
