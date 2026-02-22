@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FaFilePdf, FaFileExcel, FaCalendarAlt, FaTicketAlt, FaLayerGroup } from 'react-icons/fa'
 
-const ExportModal = ({ isOpen, onClose, onExport, events = [] }) => {
+const ExportModal = memo(({ isOpen, onClose, onExport, events = [] }) => {
   const [format, setFormat] = useState('excel') // 'excel' | 'pdf'
   const [scope, setScope] = useState('current') // 'current' (screen filter) | 'event' | 'month' | 'all'
   const [selectedEventId, setSelectedEventId] = useState('')
@@ -30,8 +30,6 @@ const ExportModal = ({ isOpen, onClose, onExport, events = [] }) => {
   // Filter events (active/past doesn't matter for export, but maybe we want all)
   // Assuming 'events' passed are already comprehensive or we just show what's available
   
-  console.log('ExportModal Rendered. isOpen:', isOpen)
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -227,6 +225,6 @@ const ExportModal = ({ isOpen, onClose, onExport, events = [] }) => {
       )}
     </AnimatePresence>
   )
-}
+})
 
 export default ExportModal

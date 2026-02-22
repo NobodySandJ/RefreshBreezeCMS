@@ -1535,6 +1535,27 @@ const AdminPage = () => {
     setMerchImagePreview(URL.createObjectURL(file))
   }
 
+  // Compress image on frontend so it stays under Vercel's 4.5MB body limit
+  const compressMerchImage = (file) => new Promise((resolve) => {
+    const MAX_PX = 800
+    const QUALITY = 0.82
+    const img = new Image()
+    img.onload = () => {
+      let { width, height } = img
+      if (width > MAX_PX || height > MAX_PX) {
+        if (width > height) { height = Math.round(height * MAX_PX / width); width = MAX_PX }
+        else { width = Math.round(width * MAX_PX / height); height = MAX_PX }
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height)
+      canvas.toBlob((blob) => resolve(blob || file), 'image/jpeg', QUALITY)
+    }
+    img.onerror = () => resolve(file)
+    img.src = URL.createObjectURL(file)
+  })
+
   const handleMerchSubmit = async (e) => {
     e.preventDefault()
     if (!merchForm.nama || !merchForm.harga) return alert('Nama dan harga wajib diisi')
@@ -1544,8 +1565,9 @@ const AdminPage = () => {
 
       // Upload image if new file selected
       if (merchImageFile) {
+        const compressed = await compressMerchImage(merchImageFile)
         const formData = new FormData()
-        formData.append('file', merchImageFile)
+        formData.append('file', compressed, 'merch.jpg')
         const uploadRes = await api.post('/upload/merch-image', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
         gambar_url = uploadRes.data.data.url
       }
@@ -1803,8 +1825,8 @@ const AdminPage = () => {
                     </td>
                     <td className="px-4 py-3">
                       <p className="font-semibold text-gray-800 text-sm">{order.nama_lengkap || '-'}</p>
-                      <p className="text-xs text-gray-500">📱 {order.whatsapp}</p>
-                      {order.instagram && <p className="text-xs text-gray-500">📷 {order.instagram}</p>}
+                      <p className="text-xs text-gray-500"><span className="font-semibold">WA:</span> {order.whatsapp}</p>
+                      {order.instagram && <p className="text-xs text-gray-500"><span className="font-semibold">IG:</span> {order.instagram}</p>}
                     </td>
                     <td className="px-4 py-3">
                       <div className="space-y-0.5">
