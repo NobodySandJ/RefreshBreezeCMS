@@ -1361,7 +1361,7 @@ const ShopPage = () => {
               >
                 <p className="text-[11px] text-gray-400 mb-2">
                   Bagikan notamu ke IGS dan tag{' '}
-                  <a href="https://www.instagram.com/refreshbreeze" target="_blank" rel="noopener noreferrer" className="font-black text-pink-400 hover:text-pink-500 transition-colors">@refreshbreeze</a>
+                  <a href="https://www.instagram.com/refreshbreeze" target="_blank" rel="noopener noreferrer" className="font-black text-[#079108] hover:text-emerald-700 transition-colors">@refreshbreeze</a>
                   {' '}— bantu Refresh Breeze makin dikenal! 💚
                 </p>
               </motion.div>
@@ -1663,7 +1663,7 @@ const ShopPage = () => {
             >
               <p className="text-[11px] text-gray-400 mb-2">
                 Bagikan notamu ke IGS dan tag{' '}
-                <a href="https://www.instagram.com/refreshbreeze" target="_blank" rel="noopener noreferrer" className="font-black text-pink-400 hover:text-pink-500 transition-colors">@refreshbreeze</a>
+                <a href="https://www.instagram.com/refreshbreeze" target="_blank" rel="noopener noreferrer" className="font-black text-[#079108] hover:text-emerald-700 transition-colors">@refreshbreeze</a>
                 {' '}— bantu Refresh Breeze makin dikenal! 💚
               </p>
             </motion.div>
