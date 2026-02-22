@@ -8,6 +8,8 @@ import configRoutes from '../backend/routes/config.js'
 import faqRoutes from '../backend/routes/faqs.js'
 import authRoutes from '../backend/routes/auth.js'
 import uploadRoutes from '../backend/routes/upload.js'
+import merchandiseRoutes from '../backend/routes/merchandise.js'
+import merchOrdersRoutes from '../backend/routes/merchOrders.js'
 
 const app = express()
 
@@ -58,6 +60,8 @@ app.use('/api/events', eventRoutes)
 app.use('/api/config', configRoutes)
 app.use('/api/faqs', faqRoutes)
 app.use('/api/upload', uploadRoutes)
+app.use('/api/merchandise', merchandiseRoutes)
+app.use('/api/merch-orders', merchOrdersRoutes)
 
 // Health check
 app.get('/api/health', (req, res) => {
