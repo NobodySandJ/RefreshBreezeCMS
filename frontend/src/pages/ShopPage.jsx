@@ -1376,7 +1376,9 @@ const ShopPage = () => {
                        const canvas = document.getElementById('receipt-canvas')
                        if (canvas) {
                           const link = document.createElement('a')
-                          link.download = `Nota_${receiptData.orderNumber}.png`
+                          const safeName = (receiptData.nama || 'customer').replace(/[^a-zA-Z0-9]/g, '_')
+                          const safeEvent = (receiptData.eventName || 'event').replace(/[^a-zA-Z0-9]/g, '_')
+                          link.download = `Nota_${safeEvent}_${safeName}.png`
                           link.href = canvas.toDataURL('image/png')
                           link.click()
                        }
@@ -2136,164 +2138,149 @@ const ReceiptDrawer = ({ receiptData }) => {
     const pad = 30
     const lineH = 22
     const rd = receiptData
-    
+
+    // Strip emoji/non-latin chars from text (for clean monospace rendering)
+    const clean = (s) => (s || '').replace(/[^\u0020-\u024F]/g, '').trim()
+
     // Load logo first
     const logo = new Image()
     logo.src = '/images/logos/logo.webp'
-    
-    // Draw logic function
+
     const draw = () => {
-        // Pre-calculate height
-        let totalLines = 0
-        totalLines += 8 // header info
-        totalLines += 1 // separator
-        totalLines += rd.items.length // items
-        totalLines += 2 // separator + total
-        totalLines += 6 // payment info (Method + Bank + Rek + An)
-        if (rd.catatan) totalLines += 2
-        totalLines += 2 // footer padding
-        totalLines += 3 // thank you + IG
+      // Pre-calculate height
+      let itemLines = rd.items.length * 2
+      let catatanLines = rd.catatan ? 2 : 0
+      const H = 340 + (itemLines * lineH) + (16 * lineH) + (catatanLines * lineH) + 100
+      canvas.width = W
+      canvas.height = H
 
-        const H = 100 + (pad * 2) + (totalLines * lineH) + 100 
-        canvas.width = W
-        canvas.height = H
+      ctx.fillStyle = '#FFFFFF'
+      ctx.fillRect(0, 0, W, H)
 
-        // Background
-        ctx.fillStyle = '#FFFFFF'
-        ctx.fillRect(0, 0, W, H)
+      let y = pad + 20
 
-        let y = pad + 20
+      const drawText = (text, x, size, color = '#000000', align = 'left', weight = 'normal', font = 'Courier New') => {
+        ctx.fillStyle = color
+        ctx.font = `${weight} ${size}px ${font}`
+        ctx.textAlign = align
+        ctx.fillText(text, x, y)
+      }
 
-        // Helper functions
-        const drawText = (text, x, size, color = '#000000', align = 'left', weight = 'normal', font = 'Courier New') => {
-          ctx.fillStyle = color
-          ctx.font = `${weight} ${size}px ${font}`
-          ctx.textAlign = align
-          ctx.fillText(text, x, y)
-        }
-
-        const drawDashedLine = () => {
-          ctx.setLineDash([5, 5])
-          ctx.strokeStyle = '#000000'
-          ctx.lineWidth = 1.5
-          ctx.beginPath()
-          ctx.moveTo(pad, y)
-          ctx.lineTo(W - pad, y)
-          ctx.stroke()
-          ctx.setLineDash([])
-          y += lineH
-        }
-
-        // ====== LOGO & HEADER ======
-        const logoW = 80
-        const logoH = 80 * (logo.height / logo.width)
-        ctx.drawImage(logo, (W - logoW) / 2, y, logoW, logoH)
-        y += logoH + 20
-
-        drawText('REFRESH BREEZE', W / 2, 24, '#000000', 'center', 'bold')
-        y += lineH + 5
-        drawText('Official Store', W / 2, 14, '#000000', 'center', 'normal')
-        y += lineH + 5
-        
+      const drawDashedLine = () => {
+        ctx.setLineDash([5, 5])
         ctx.strokeStyle = '#000000'
-        ctx.lineWidth = 2
-        const boxW = 280
-        const boxH = 34
-        ctx.strokeRect((W - boxW) / 2, y, boxW, boxH)
-        y += 24
-        drawText(rd.orderNumber, W / 2, 16, '#000000', 'center', 'bold')
-        y += lineH + 10
-
-        drawDashedLine()
-        
-        // ====== INFO ======
-        drawText(rd.createdAt, pad, 12, '#000000', 'left', 'normal')
-        drawText('Admin', W - pad, 12, '#000000', 'right', 'normal')
+        ctx.lineWidth = 1.5
+        ctx.beginPath()
+        ctx.moveTo(pad, y)
+        ctx.lineTo(W - pad, y)
+        ctx.stroke()
+        ctx.setLineDash([])
         y += lineH
-        drawText(`Event: ${rd.eventName}`, pad, 12, '#000000', 'left', 'normal')
+      }
+
+      // ====== LOGO & HEADER ======
+      const logoW = 80
+      const logoH = 80 * (logo.height / logo.width)
+      ctx.drawImage(logo, (W - logoW) / 2, y, logoW, logoH)
+      y += logoH + 20
+
+      drawText('REFRESH BREEZE', W / 2, 24, '#000000', 'center', 'bold')
+      y += lineH + 5
+      drawText('Official Store', W / 2, 14, '#000000', 'center', 'normal')
+      y += lineH + 5
+
+      ctx.strokeStyle = '#000000'
+      ctx.lineWidth = 2
+      const boxW = 280
+      const boxH = 34
+      ctx.strokeRect((W - boxW) / 2, y, boxW, boxH)
+      y += 24
+      drawText(rd.orderNumber, W / 2, 16, '#000000', 'center', 'bold')
+      y += lineH + 10
+
+      drawDashedLine()
+
+      // ====== DATE + EVENT ======
+      drawText(rd.createdAt, pad, 12, '#000000', 'left', 'normal')
+      drawText('Admin', W - pad, 12, '#000000', 'right', 'normal')
+      y += lineH
+      drawText(`Event: ${rd.eventName}`, pad, 12, '#000000', 'left', 'normal')
+      y += lineH
+
+      drawDashedLine()
+
+      // ====== CUSTOMER INFO (top) ======
+      drawText('Nama  :', pad, 12, '#000000', 'left', 'normal')
+      drawText(rd.nama || '-', pad + 80, 12, '#000000', 'left', 'bold')
+      y += lineH
+      drawText('Kontak:', pad, 12, '#000000', 'left', 'normal')
+      drawText(rd.kontak || '-', pad + 80, 12, '#000000', 'left', 'normal')
+      y += lineH
+      if (rd.catatan) {
+        drawText('Catatan:', pad, 12, '#000000', 'left', 'normal')
         y += lineH
-
-        drawDashedLine()
-
-        // ====== ITEMS ======
-        rd.items.forEach(item => {
-          drawText(item.name, pad, 12, '#000000', 'left', 'bold')
-          y += lineH - 4
-          drawText(`${item.quantity} x ${item.price.toLocaleString('id-ID')}`, pad + 20, 12, '#000000', 'left', 'normal')
-          drawText(`Rp ${(item.price * item.quantity).toLocaleString('id-ID')}`, W - pad, 12, '#000000', 'right', 'normal')
-          y += lineH + 4
+        const words = rd.catatan.split(' ')
+        let cline = ''
+        words.forEach(word => {
+          if (ctx.measureText(cline + word).width > W - (pad * 2)) {
+            drawText(cline, pad, 12, '#000000', 'left', 'italic')
+            cline = word + ' '
+            y += lineH
+          } else { cline += word + ' ' }
         })
+        drawText(cline, pad, 12, '#000000', 'left', 'italic')
+        y += lineH
+      }
 
-        drawDashedLine()
+      drawDashedLine()
 
-        // ====== TOTAL ======
-        drawText('Total QTY:', pad, 12, '#000000', 'left', 'normal')
-        drawText(rd.items.reduce((acc, i) => acc + i.quantity, 0).toString(), W - pad, 12, '#000000', 'right', 'normal')
-        y += lineH
-        
-        drawText('Sub Total', pad, 12, '#000000', 'left', 'normal')
-        drawText(`Rp ${rd.total.toLocaleString('id-ID')}`, W - pad, 12, '#000000', 'right', 'normal')
-        y += lineH + 5
-        
-        drawText('TOTAL', pad, 20, '#000000', 'left', 'bold')
-        drawText(`Rp ${rd.total.toLocaleString('id-ID')}`, W - pad, 20, '#000000', 'right', 'bold')
-        y += lineH + 10
-        
-        drawText('Metode Bayar', pad, 12, '#000000', 'left', 'normal')
-        drawText('Transfer', W - pad, 12, '#000000', 'right', 'normal')
-        y += lineH
+      // ====== ITEMS (no emoji) ======
+      rd.items.forEach(item => {
+        drawText(clean(item.name), pad, 12, '#000000', 'left', 'bold')
+        y += lineH - 4
+        drawText(`${item.quantity} x ${item.price.toLocaleString('id-ID')}`, pad + 20, 12, '#000000', 'left', 'normal')
+        drawText(`Rp ${(item.price * item.quantity).toLocaleString('id-ID')}`, W - pad, 12, '#000000', 'right', 'normal')
+        y += lineH + 4
+      })
 
-        // Transfer Details
-        drawText('Bank', pad, 12, '#000000', 'left', 'normal')
-        drawText('BCA', W - pad, 12, '#000000', 'right', 'normal')
-        y += lineH
-        drawText('No. Rek', pad, 12, '#000000', 'left', 'normal')
-        drawText('0902683273', W - pad, 12, '#000000', 'right', 'normal')
-        y += lineH
-        drawText('A/n', pad, 12, '#000000', 'left', 'normal')
-        drawText('NATASYA ANGELINA PUTRI', W - pad, 12, '#000000', 'right', 'normal')
-        y += lineH
+      drawDashedLine()
 
-        drawDashedLine()
+      // ====== TOTAL ======
+      drawText('Total QTY:', pad, 12, '#000000', 'left', 'normal')
+      drawText(rd.items.reduce((acc, i) => acc + i.quantity, 0).toString(), W - pad, 12, '#000000', 'right', 'normal')
+      y += lineH
+      drawText('Sub Total', pad, 12, '#000000', 'left', 'normal')
+      drawText(`Rp ${rd.total.toLocaleString('id-ID')}`, W - pad, 12, '#000000', 'right', 'normal')
+      y += lineH + 5
+      drawText('TOTAL', pad, 20, '#000000', 'left', 'bold')
+      drawText(`Rp ${rd.total.toLocaleString('id-ID')}`, W - pad, 20, '#000000', 'right', 'bold')
+      y += lineH + 10
 
-        // ====== CUSTOMER ======
-        drawText('Nama  :', pad, 12, '#000000', 'left', 'normal')
-        drawText(rd.nama || '-', pad + 80, 12, '#000000', 'left', 'bold')
-        y += lineH
-        drawText('Kontak:', pad, 12, '#000000', 'left', 'normal')
-        drawText(rd.kontak || '-', pad + 80, 12, '#000000', 'left', 'normal')
-        y += lineH
-        
-        if (rd.catatan) {
-           drawText('Catatan:', pad, 12, '#000000', 'left', 'normal')
-           y += lineH
-           const words = rd.catatan.split(' ')
-           let line = ''
-           words.forEach(word => {
-             if (ctx.measureText(line + word).width > W - (pad * 2)) {
-               drawText(line, pad, 12, '#000000', 'left', 'italic')
-               line = word + ' '
-               y += lineH
-             } else {
-               line += word + ' '
-             }
-           })
-           drawText(line, pad, 12, '#000000', 'left', 'italic')
-           y += lineH
-        }
-        
-        drawDashedLine()
-        
-        // ====== FOOTER ======
-        y += 10
-        drawText('Terima kasih telah berbelanja', W / 2, 14, '#000000', 'center', 'normal')
-        y += lineH
-        drawText('IG: @refreshbreeze', W / 2, 14, '#000000', 'center', 'bold')
-        y += lineH
+      // ====== PAYMENT INFO ======
+      drawText('Metode Bayar', pad, 12, '#000000', 'left', 'normal')
+      drawText('Transfer', W - pad, 12, '#000000', 'right', 'normal')
+      y += lineH
+      drawText('Bank', pad, 12, '#000000', 'left', 'normal')
+      drawText('BCA', W - pad, 12, '#000000', 'right', 'normal')
+      y += lineH
+      drawText('No. Rek', pad, 12, '#000000', 'left', 'normal')
+      drawText('0902683273', W - pad, 12, '#000000', 'right', 'normal')
+      y += lineH
+      drawText('A/n', pad, 12, '#000000', 'left', 'normal')
+      drawText('NATASYA ANGELINA PUTRI', W - pad, 12, '#000000', 'right', 'normal')
+      y += lineH
+
+      drawDashedLine()
+
+      // ====== FOOTER ======
+      y += 8
+      drawText('Terima kasih atas pembelianmu!', W / 2, 14, '#000000', 'center', 'bold')
+      y += lineH
+      drawText('Refresh Breeze', W / 2, 14, '#079108', 'center', 'bold')
+      y += lineH
     }
 
     logo.onload = draw
-    // Fallback if logo fails or is cached? Just draw anyway
     if (logo.complete) draw()
 
   }, [receiptData])
