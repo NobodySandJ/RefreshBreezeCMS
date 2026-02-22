@@ -1677,7 +1677,8 @@ const ShopPage = () => {
                     const canvas = document.getElementById('merch-receipt-canvas')
                     if (canvas) {
                       const link = document.createElement('a')
-                      link.download = `Nota_${merchReceiptData.orderNumber}.png`
+                      const safeMerchName = (merchReceiptData.nama || 'pembeli').replace(/[^a-zA-Z0-9]/g, '_')
+                      link.download = `Nota_${safeMerchName}.png`
                       link.href = canvas.toDataURL('image/png')
                       link.click()
                     }
