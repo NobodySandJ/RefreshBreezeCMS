@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FaShoppingCart, FaPlus, FaMinus, FaChevronRight, FaCamera, FaCheckCircle, FaRegCopy, FaTicketAlt, FaInfoCircle, FaSpinner, FaUniversity, FaTrash, FaCopy, FaDownload, FaBox, FaBoxOpen, FaTimes } from 'react-icons/fa'
+import { FaShoppingCart, FaPlus, FaMinus, FaChevronRight, FaCamera, FaCheckCircle, FaRegCopy, FaTicketAlt, FaInfoCircle, FaSpinner, FaUniversity, FaTrash, FaCopy, FaDownload, FaBox, FaBoxOpen, FaTimes, FaExclamationTriangle } from 'react-icons/fa'
 import { getAssetPath } from '../lib/pathUtils'
 import api from '../lib/api'
 import Skeleton from '../components/Skeleton'
@@ -721,10 +721,10 @@ const ShopPage = () => {
                               )}
                             </div>
                             {(!item.stok || item.stok === 0) && (
-                              <p className="text-[10px] text-emerald-600 font-bold">⏳ Pre-Order</p>
+                              <p className="text-[10px] text-emerald-600 font-bold">Pre-Order</p>
                             )}
                             {item.stok > 0 && item.stok <= 10 && !habis && (
-                              <p className="text-[10px] text-orange-500 font-bold">⚠️ Sisa {item.stok} item</p>
+                              <p className="text-[10px] text-orange-500 font-bold flex items-center gap-1"><FaExclamationTriangle className="text-[9px]" /> Sisa {item.stok}</p>
                             )}
                           </div>
                         </motion.div>
@@ -1100,7 +1100,7 @@ const ShopPage = () => {
                                              {events.find(e => e.id === formData.event_id)?.theme_name || 'Special'}
                                           </span>
                                        )}
-                                       <span className="text-gray-400">•</span>
+                                       <span className="text-gray-300">|</span>
                                        <span className="text-gray-500">{events.find(e => e.id === formData.event_id)?.tanggal} {events.find(e => e.id === formData.event_id)?.bulan}</span>
                                     </div>
                                  ) : (
@@ -1515,7 +1515,7 @@ const ShopPage = () => {
                       rows={4}
                     />
                     <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 flex items-start gap-2">
-                      <span className="text-orange-500 text-sm mt-0.5">⚠️</span>
+                      <FaExclamationTriangle className="text-orange-500 text-sm mt-0.5 flex-shrink-0" />
                       <p className="text-[10px] text-orange-700 font-semibold leading-relaxed">
                         <strong>Ongkos kirim ditanggung pembeli.</strong> Jika memilih pengiriman, pastikan alamat lengkap agar merch sampai tepat waktu. Untuk COD, ambil langsung di lokasi event.
                       </p>
@@ -1766,7 +1766,7 @@ const ShopPage = () => {
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="text-2xl font-black text-[#079108]">IDR {selectedMerch.harga.toLocaleString()}</span>
                   {selectedMerch.stok > 0 && selectedMerch.stok <= 10 && (
-                    <span className="text-xs text-orange-500 font-bold">⚠️ Sisa {selectedMerch.stok}</span>
+                    <span className="text-xs text-orange-500 font-bold flex items-center gap-1"><FaExclamationTriangle className="text-[10px]" /> Sisa {selectedMerch.stok}</span>
                   )}
                 </div>
 
@@ -1830,7 +1830,7 @@ const ShopPage = () => {
             {/* Header */}
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${lineupError.eventColor}15` }}>
-                <span className="text-lg">⚠️</span>
+                <FaExclamationTriangle className="text-lg" style={{ color: lineupError.eventColor }} />
               </div>
               <div>
                 <p className="font-black text-sm uppercase tracking-wider text-gray-900">Member Tidak Tersedia</p>
